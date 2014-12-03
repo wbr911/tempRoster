@@ -1,0 +1,147 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+ xmlns:p="http://primefaces.org/ui">
+ 
+<ui:composition >
+	<p:panel id="candDetailDialog" style="position:fixed ; left:100% ; top:34px ; width:35% ; height:100%;display:none;padding:0px 0px" >
+       <span class="glyphicon glyphicon-arrow-right" onclick="closeCandDetail()"></span>
+       <p:panel id="candDetail" style="border:none; padding:0px 0px">
+       <p:outputLabel value="#{candidateView.selectedCand.name}" style="font-size:1.5em" styleClass="text-primary"></p:outputLabel>
+       <p:tabView  style="background:transparent;border:none;padding:0px 0px" prependId="false">
+        <p:tab title="detail">
+        <div class="row">
+         <div class="col-md-5">
+         <p:graphicImage value="#{candidateView.selectedCand.pic}" width="100%"/>
+         </div>
+         <div id="tagsContainer" class="col-md-7" style="overflow-y:scroll;">
+         <div class="row">
+         <div class="col-md-2 edit">
+    	 	 <p:outputLabel value="skills"   style="margin-right:10px"/>
+    	 </div>
+    	 
+         <ui:repeat var="tag" value="#{candidateView.selectedCand.skills}">
+         	<p:outputLabel value="#{tag}" styleClass="label label-primary" style="float:left"></p:outputLabel>
+         </ui:repeat>
+         </div>
+         <div class="row">
+         <ui:repeat var="tag" value="#{candidateView.selectedCand.certificates}">
+         	<p:outputLabel value="#{tag}" styleClass="label label-info" style="float:left"></p:outputLabel>
+         </ui:repeat>
+         </div>
+         <div class="row">
+         <ui:repeat var="tag" value="#{candidateView.selectedCand.keywords}">
+         	<p:outputLabel value="#{tag}" styleClass="label label-warning" style="float:left"></p:outputLabel>
+         </ui:repeat>
+         </div>
+         </div>
+         <div id="tagsEditContainer" style="display:none">
+         	<div class="row">
+    	 	     	<div class="col-md-2">
+    	 	     	 <p:outputLabel value="skills"   style="margin-right:10px"/>
+    	 	     	</div>
+    	 	     	<div class="col-md-10" id="skills_panel">
+    	 	     	<p:panel styleClass="clearfix">
+    	 	     	<p:autoComplete style="width:200px;float:left" id="skillsVar" widgetVar="skillsVar" onkeydown="keyListener(event)" 
+    	 	     	forceSelection="true"  completeMethod="#{candidateView.completeTag}" 
+    	 	     	onchange="addTag('requiredVar')"/>
+    	 	     	</p:panel>
+    	 	     	</div>
+    	 	     </div>
+    	 	    
+    	 	      <div class="row">
+    	 	     	<div class="col-md-2">
+    	 	     	 <p:outputLabel value="certificates"   style="margin-right:10px"/>
+    	 	     	</div>
+    	 	     	<div class="col-md-10" id="certificates_panel">
+    	 	     	<p:panel styleClass="clearfix">
+    	 	     	<p:autoComplete style="width:200px;float:left" id="certificatesVar" widgetVar="certificatesVar" onkeydown="keyListener(event)" 
+    	 	     	forceSelection="true"  completeMethod="#{candidateView.completeTag}" 
+    	 	     	onchange="addTag('optionalVar')"/>
+    	 	     	</p:panel>
+    	 	     	</div>
+    	 	     </div>
+    	 	       <div class="row">
+    	 	     	<div class="col-md-2">
+    	 	     	 <p:outputLabel value="user define"   style="margin-right:10px"/>
+    	 	     	</div>
+    	 	     	<div class="col-md-10" id="userDefine_panel">
+    	 	     	<p:panel styleClass="clearfix">
+    	 	     	<p:autoComplete style="width:200px;float:left" id="userDefineVar" widgetVar="userDefineVar" onkeydown="keyListener(event)" 
+    	 	     	forceSelection="true"  completeMethod="#{candidateView.completeTag}" 
+    	 	     	onchange="addTag('excludedVar')"/>
+    	 	     	</p:panel>
+    	 	     	
+    	 	     	</div>
+    	 	     </div>
+         </div><!-- end of the tagsEditContainer -->
+        </div> <!-- end of the pic and tag row -->
+        <div style="border:none;margin:10px 0px; " class="clearfix" >
+        <p:outputLabel id="statusDetail" value="#{candidateView.selectedCand.status}" style="float:left;margin-right:10px"/>
+        <div id="chosenDetail" style="display:none;float:left;"> <kbd>chosen by</kbd>  <h:outputText value="#{candidateView.selectedCand.chosenBy}" style="margin:0px 10px"/>  
+        <kbd>for job</kbd> <h:outputText value="#{candidateView.selectedCand.job}" style="margin-left:10px"></h:outputText>  </div>
+        <div id="placedDetail" style="display:none;float:left"> <kbd>placed to</kbd>  <h:outputText value="#{candidateView.selectedCand.employer}" style="margin:0px 10px"></h:outputText>  
+        <kbd>for job</kbd> <h:outputText value="#{candidateView.selectedCand.job}" style="margin-left:10px"></h:outputText>  </div>
+        
+        </div>
+        <h:panelGrid columns="3" style="width:100%" styleClass="bg-info">
+        <p:outputLabel value="title"/>
+        <h:outputText styleClass="output_" value="#{candidateView.selectedCand.title}" />
+        <p:inputText styleClass="input_" value="#{candidateView.selectedCand.title}" style="width:100%"/>
+        <p:outputLabel value="age"/>
+        <h:outputText styleClass="output_" value="#{candidateView.selectedCand.age}" />
+        <p:inputText styleClass="input_" value="#{candidateView.selectedCand.age}" style="width:100%"/>
+        <p:outputLabel value="phone"/>
+        <h:outputText styleClass="output_" value="#{candidateView.selectedCand.phone}" />
+        <p:inputText styleClass="input_" value="#{candidateView.selectedCand.phone}" style="width:100%"/>
+        <p:outputLabel value="email"/>
+        <h:outputText styleClass="output_" value="#{candidateView.selectedCand.email}" />
+        <p:inputText styleClass="input_" value="#{candidateView.selectedCand.email}" style="width:100%"/>
+        
+        <p:outputLabel value="address"/>
+        <h:outputText styleClass="output_" value="#{candidateView.selectedCand.address.des}" />
+        <p:inputText styleClass="input_" value="#{candidateView.selectedCand.address.des}" style="width:100%"/>
+        <p:outputLabel value="education"/>
+        
+         <h:outputText styleClass="output_" value="#{candidateView.selectedCand.education}" />
+         <p:inputText styleClass="input_" value="#{candidateView.selectedCand.education}" style="width:100%"/>
+         
+         </h:panelGrid>     
+        </p:tab>
+        <p:tab title="resume"></p:tab>
+        <p:tab title="note">
+        <h:form prependId="false" id="note_f">
+        <label id="addNote_btn" class="btn btn-primary" onclick="$('#newNote').show();$('#addNote_btn').hide()"><span class="glyphicon glyphicon-plus"></span></label>        
+        <p:panel id="newNote" styleClass="bg-info" style="margin:10px 0px;display:none">
+         <p:inputTextarea  id="newNoteContent" value="#{candidateView.newNote.content}" style="width:100%"></p:inputTextarea>
+         <p:commandLink update="note_f" actionListener="#{candidateView.addNote}"  process="newNote" oncomplete="$('#newNote').hide();$('#newNoteContent').val('');$('#addNote_btn').show()"><span class="glyphicon glyphicon-ok"></span></p:commandLink>
+         <a><span class="glyphicon glyphicon-remove" onclick="$('#newNote').hide();$('#newNoteContent').val('');$('#addNote_btn').show()"></span></a>        
+        </p:panel>
+         
+         <ui:repeat var="note" value="#{candidateView.selectedCand.noteList}">
+         	<p:panel styleClass="bg-info" style="margin:10px 0px">
+                <div class="clearfix" >
+                <p:outputLabel value="#{note.id}" style="display:none" styleClass="noteId"/>
+         		<div style="float:left"><h4><h:outputText value="#{note.consultant}"/></h4></div>
+         		<div style="float:right">
+         		<h:outputText value="#{note.date}"></h:outputText>
+         		<p:commandLink update="@([id=note_f])" actionListener="#{candidateView.deleteNote()}" process="@this" > 
+         		  <f:setPropertyActionListener target="#{candidateView.selectedNote}" value="#{note}"></f:setPropertyActionListener>
+         		  <f:param name="deleteId" value="#{note.id}"></f:param>
+         		<span class="glyphicon glyphicon-remove"></span></p:commandLink>
+         		</div>
+         		</div>
+         		<h:outputText value="#{note.content}"></h:outputText>
+         	</p:panel>
+         </ui:repeat>
+         
+         </h:form>
+        </p:tab>    
+       </p:tabView>
+		</p:panel>
+	</p:panel>
+</ui:composition>
+</html>

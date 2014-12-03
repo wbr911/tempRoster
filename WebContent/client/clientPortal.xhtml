@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	  xmlns:h="http://java.sun.com/jsf/html"
+	  xmlns:f="http://java.sun.com/jsf/core"
+	  xmlns:ui="http://java.sun.com/jsf/facelets"
+	  xmlns:p="http://primefaces.org/ui"
+	  >
+<h:head>
+  <link rel="stylesheet" href="http://cdn.bootcss.com/bootstrap/3.2.0/css/bootstrap.min.css"/>
+<link href="../css/myCss.css" rel="stylesheet" type="text/css"/> 
+  <!-- 可选的Bootstrap主题文件（一般不用引入） -->
+  <link href="data:text/css;charset=utf-8," data-href="http://cdn.bootcss.com/bootstrap/css/bootstrap-theme.min.css" rel="stylesheet" id="bs-theme-stylesheet"/>
+  <!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
+  <script src="http://cdn.bootcss.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+ 
+<SCRIPT type="text/javascript">
+$(function(){
+	
+	$(document).on('click' ,'#job_t td',function(){
+		if($(this).find('.ui-row-toggler').size()!=1){
+		$(this).parent().find('.ui-row-toggler').click();
+		}
+	});
+});
+
+function showCandDetail(){
+	if($('#statusDetail').text() == 'available'){
+		$('#candDetail_toolPanel').show();
+	}
+	$('#candDetailDialog').css('height' , $(window).height());
+	$('#candDetailDialog').show();
+	if($('#candDetailDialog').css('right')=='auto'){
+	var width=$('#candDetailDialog').width()+$('#candDetailDialog').css('padding-left').replace('px','')*2;
+	$('#candDetailDialog').css('right','-'+width+'px');}
+	$('#candDetailDialog').animate({right:'0px' },500);
+	
+}
+
+function closeCandDetail(){
+	var width=$('#candDetailDialog').width()+$('#candDetailDialog').css('padding-left').replace('px','')*2
+	$('#candDetailDialog').animate({right:'-'+width+'px' },500);
+
+}
+function init(){
+	$('.jobStatus').each(function(){
+		if($(this).html()!=''){
+			$(this).parent().find('label').hide();
+		}
+		
+	});
+	
+	
+}
+var ajaxCheck = true;
+function checkAjaxStatus(){
+	if(ajaxCheck){
+		ajaxCheck = false;
+		$('#ajaxStatusCheckBtn').click();
+	}
+}
+
+function redirect(){
+	if($('#ajaxStatusLabel').text()=='wrong'){
+	 location.replace('http://localhost:9090/TempsRoster/clientErrorPage.jsf');
+	}
+	else{
+		ajaxCheck= true;
+	}
+	
+}
+</SCRIPT>
+<meta charset="UTF-8"></meta>
+<title>Client Portal</title>
+</h:head>
+<body>
+<h:form prependId="false" id="client_f">
+<div class="panel my-header clearfix" >
+<span style="color:whitesmoke;font-size:1.5em">Welcome to client portal</span> <label class="label" style="background-color:#f5f5f5;color:inherit"><h:outputText value="#{clientPortal.client.name}"/></label>
+</div>
+<p:growl autoUpdate="true" showDetail="true"/>
+       <p:dataTable id="job_t" selectionMode="single"  value="${clientPortal.jobs}" var="job" rowExpandMode="single" rowKey="#{job.id}" 
+       expandedRow="#{clientPortal.firstId}" style="margin-top:20px"> 
+       <p:ajax event="rowSelect" process="@none" listener="#{clientPortal.onRowSelected}" ></p:ajax>
+       <p:ajax event="rowToggle" process="@none" listener="#{clientPortal.onRowToggle}" update="@none" oncomplete="init()"/>
+       <p:column style="width:0px;">
+            <p:rowToggler/>
+        </p:column>
+       <p:column headerText="Job Title">
+       	<p:outputLabel value="#{job.title}"/>
+       </p:column>
+       <p:column headerText="Required Number">
+       	<p:outputLabel value="#{job.amount}"/>
+       </p:column>
+       <p:column headerText="Candidate Number">
+       	<p:outputLabel value="#{job.accepted}"/>
+       </p:column>
+       <p:column headerText="Status" sortBy="#{job.status}">
+       	<h:outputText escape="false" value="#{job.statusLabel}"/>
+       </p:column>
+        <p:rowExpansion>
+         <div style="border-bottom:1px solid #d4d4d4">
+             <div class="jobToolBar">
+    	 	 <p:commandLink actionListener="#{clientPortal.agree}" update="job_t" oncomplete="init()">
+    	 	 <p:confirm header="Confirm Dialog"  message="sure to agree with the employment"></p:confirm>
+    	 	 <label class="btn btn-primary">Agree</label></p:commandLink>
+    	 	
+    	 	 <p:commandLink actionListener="#{clientPortal.refuse}" update="job_t" oncomplete="init()">
+    	 	 <p:confirm header="Confirm Dialog"  message="sure to refuse the employment"></p:confirm>
+    	 	 <label class="btn btn-danger">Refuse</label>
+    	     </p:commandLink>
+    	     <h:outputText style="display:none" class="jobStatus" escape="false" value="#{job.jobStatusForClientPortal}"></h:outputText>
+    	     </div>
+    	     
+    	 	
+        </div>
+         <p:tabView>
+         <p:tab title="candidates">
+        <ui:decorate template="../user/job_candidate_table.xhtml">
+           <ui:param name="type" value="job"></ui:param>
+           <ui:param name="id" value="#{job.id}"></ui:param>
+           <ui:param name="job" value="#{job}"></ui:param>
+          
+           <ui:define name="rowSelectAjax">
+            <p:ajax event="rowSelect" listener="#{clientPortal.onCandRowSelect}" update="@([id=candDetailDialogContent])" oncomplete="showCandDetail()" />
+           </ui:define>
+          </ui:decorate>
+         </p:tab>
+         <p:tab title="conditions">
+          <p:panelGrid columns="2" styleClass="fillWidth" style="width:100%">
+	 <p:outputLabel  value="quotation" />
+	 <h:panelGroup>
+	 <p:outputLabel id="quotation"  value="#{job.quotation}" >
+	 <span>/h</span></p:outputLabel>
+	 </h:panelGroup>       
+	   
+	 <p:outputLabel id="maxHour" value="maxHour"/>
+	 <p:outputLabel  value="#{job.maxHour}" >
+	 	
+	 </p:outputLabel>
+     
+     
+     <p:outputLabel id="beginDate" value="beginDate"/>
+	 <p:outputLabel  value="#{job.beginDate}" styleClass="fillWidth"  >
+	 <f:convertDateTime pattern="MM/dd/yyyy"></f:convertDateTime>
+	 </p:outputLabel>
+     
+     
+     <p:outputLabel id="endDate" value="endDate"/>
+	 <p:outputLabel value="#{job.endDate}" styleClass="fillWidth" pattern="MM/dd/yyyy" >
+      <f:convertDateTime pattern="MM/dd/yyyy"></f:convertDateTime>	
+      </p:outputLabel> 
+      <p:outputLabel value="address"/>
+      <p:outputLabel value="#{job.address.des}"></p:outputLabel>
+	
+	</p:panelGrid>
+
+         </p:tab>
+         </p:tabView>  
+       </p:rowExpansion>
+        </p:dataTable>
+ </h:form>
+ <h:form >
+ <p:confirmDialog global="true">
+         <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes"
+         icon="ui-icon-check"/>
+         <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no"
+         icon="ui-icon-close"/>
+   </p:confirmDialog>
+   <p:commandButton id="ajaxStatusCheckBtn" style="display:none" process="@none" update="ajaxStatusLabel" oncomplete="redirect()"></p:commandButton>
+   <p:outputLabel id="ajaxStatusLabel" style="display:none" value="#{ajaxBean.ajaxStatus}"></p:outputLabel>
+</h:form>
+<h:form prependId="false">
+<ui:decorate template="candDetail_for_client.xhtml">
+<ui:param name="cand" value="#{clientPortal.selectedCand}"></ui:param>
+</ui:decorate>
+</h:form>
+<p:ajaxStatus onstart="checkAjaxStatus()"
+/> 
+</body>
+</html>

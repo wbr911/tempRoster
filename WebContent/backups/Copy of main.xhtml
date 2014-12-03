@@ -1,0 +1,378 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	  xmlns:h="http://java.sun.com/jsf/html"
+	  xmlns:f="http://java.sun.com/jsf/core"
+	  xmlns:ui="http://java.sun.com/jsf/facelets"
+	  xmlns:p="http://primefaces.org/ui"
+	  >
+<h:head>
+  <link rel="stylesheet" href="http://cdn.bootcss.com/bootstrap/3.2.0/css/bootstrap.min.css"/>
+
+  <!-- 可选的Bootstrap主题文件（一般不用引入） -->
+  <link href="data:text/css;charset=utf-8," data-href="http://cdn.bootcss.com/bootstrap/css/bootstrap-theme.min.css" rel="stylesheet" id="bs-theme-stylesheet"/>
+
+
+ 
+  <!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
+  <script src="http://cdn.bootcss.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+<script type="text/javascript">
+
+$(function(){
+	$(".ui-autocomplete-input").each(function(){
+		$(this).css('border','none');
+		$(this).css('box-shadow','none');
+	});
+$("#requiredVar_panel").mouseup(function(e){
+		$("#requiredVar_input").change();
+	});
+$("#optionalVar_panel").mouseup(function(e){
+	$("#optionalVar_input").change();
+});
+$("#excludedVar_panel").mouseup(function(e){
+	$("#excludedVar_input").change();
+})
+$(window).scroll(function(){
+
+	  if($(window).scrollTop()>40){
+	    $("#candDetailDialog").css("top","0px");
+	  }else{
+	      $("#candDetailDialog").css("top","40px");
+	    }
+	  }
+	);
+});
+
+var intervalName;
+var timeout;
+var inputId;
+var type;
+function addTag(id,_type){
+	inputId = id;
+	type= _type;
+	intervalName= setInterval(handle,10); 
+	$('#' + inputId+'_input').val('~not exist');
+}
+function handle(){
+	
+	  if($('#' + inputId+'_input').val()!='~not exist'){
+		  _addTag(inputId,type);
+	      clearInterval(intervalName);
+	  }
+}
+function _addTag(id,type){
+	if($('#' + id+'_input').val()!=''){
+		 switch (type){
+		 case undefined:
+		 case 'skills':
+			 var tag = '<label class="ui-outputlabel ui-widget label label-primary" style="display:inline; float:left;" >'+$('#' + id + '_input').val()+'<a class="glyphicon glyphicon-remove" style="color:white;" onclick="removeTag(this)"></a>'+'</label>';
+			 break;
+		 case 'certificates':
+			 var tag = '<label class="ui-outputlabel ui-widget label label-info" style="display:inline; float:left;" >'+$('#' + id + '_input').val()+'<a class="glyphicon glyphicon-remove" style="color:white;" onclick="removeTag(this)"></a>'+'</label>';
+			
+			 break;
+		 case 'userDefine':
+			 var tag = '<label class="ui-outputlabel ui-widget label label-warning" style="display:inline; float:left;" >'+$('#' + id + '_input').val()+'<a class="glyphicon glyphicon-remove" style="color:white;" onclick="removeTag(this)"></a>'+'</label>';
+			 break;
+		 }
+
+		  $('#' + id + '_input').val('')
+		  $('#' + id + '_input').css('width','20px')
+		  $('#' + id).before(tag);
+		  }
+
+}
+
+function removeTag(div){
+	$(div).parent().remove();
+}
+function keyListener(event){
+	if(event.keyCode==13){
+		var id = '#' + event.target.id.replace('_input','')+'_panel';
+		if($(id).css('display')!='block'){
+		      _addTag(event.target.id.replace('_input',''));
+
+		}else{
+		$('#'+event.target.id).change();
+		}
+    
+	event.preventDefault(); 
+	window.event.returnValue = false;
+	}
+	if(event.keyCode==8){
+		if($(event.target).val()==''){
+		var tags = $(event.target).parent().prevAll('label');
+		if(tags.length != 0){
+			tags[tags.length-1].remove();
+		}
+		}
+	}
+}
+function changeLength(event){
+	$('#'+event.target.id).css('width',20+$('#'+event.target.id).val().length*8.5+'px');
+	
+	}
+//-------------------------------detail dialog-------------------------------------------
+function showCandDetail(){
+	$('#candDetailDialog').show();
+	$('#candDetailDialog').animate({left:'65%' },500);
+	_initCandDetail();
+}
+function closeCandDetail(){
+	$('#candDetailDialog').animate({left:'100%'},500);
+}
+function _initCandDetail(){
+	switch ($('#statusDetail').text()){
+	case 'available' :
+		$('#statusDetail').addClass('label label-primary');
+	    break;
+	case  'chosen':
+		$('#statusDetail').addClass('label label-warning');
+	    $('#chosenDetail').show();
+	break;
+	case 'placed':
+		$('#statusDetail').addClass('label label-info');
+	    $('placedDetail').show();
+	break;
+	case 'rest':
+		$('#statusDetail').addClass('label label-danger');
+	break;
+	}
+}
+function showTagsEditView(){
+	$('.ui-autocomplete-input').each(function(){
+		$(this).css('border','none');
+		$(this).css('box-shadow','none');
+	});
+	var width =$('#picContainer').width() +parseInt($('#picContainer').css('padding').split(' ')[1].replace('px',''))*2;
+	$('#tagsEditView').css('left',width+'px');
+	var min_height=$('#tagsContainer').parent().height() + 'px';
+
+	$('#tagsEditView_content').css('min-height',min_height);
+	$('#skillsVar').before($($('#tagsContainer').find('.row')[1]).html());
+	$('#certificatesVar').before($($('#tagsContainer').find('.row')[2]).html());
+	$('#userDefineVar').before($($('#tagsContainer').find('.row')[3]).html());
+	$('#tagsEditView').find('.edit').each(function(){
+		$(this).css('display','inline');
+	});
+	$('#tagsEditViewDetail').show();
+	$('#tagsEditView').show();
+	$('#tagsEditView').animate({'left':'0%','width':'100%','opacity':'1'} ,200);
+	
+}
+function hideTagsEditView(){
+	var width =$('#picContainer').width() +parseInt($('#picContainer').css('padding').split(' ')[1].replace('px',''))*2;
+	$('#tagsEditView').animate({'left':width+'px','opacity':'0.5'},200,
+			function(){
+				$('#tagsEditView').hide();
+			    $('#skillsVar').prevAll().remove();
+				$('#certificatesVar').prevAll().remove();
+				$('#userDefineVar').prevAll().remove();
+			});
+}
+function parseCandTag(){
+	var tags = '';
+	tags =_parseTag('#skillsVar' , tags);
+	tags =_parseTag('#certificatesVar' , tags);
+	tags =_parseTag('#userDefineVar' , tags);
+	$('#hiddenCandTag').val(tags);
+	hideTagsEditView();
+}
+function _parseTag(id,tags){
+	tags +='{';
+		$(id).parent().children('.label').each(function(){
+			tags += $(this).text() + ',';	
+		});
+	tags += '}';
+	return tags;
+}
+
+//-------------------------------end of detail dialog-------------------------------------------
+</script>
+
+<style type="text/css">
+.add-placeholder{
+ 
+}
+.input_
+{display:none;
+}
+.edit{
+display:none;
+}
+
+.clearfix:after {
+clear: both;
+content: '.';
+display: block;
+height: 0px;
+overflow: hidden;
+visibility: hidden;
+}
+label{ margin-left:5px}
+.ui-selectonemenu .ui-selectonemenu-trigger{
+width:24px
+}
+.ui-autocomplete-input{
+width:100%}
+</style>
+	<title>test</title>
+
+</h:head>
+<h:body style="font-size:1.4em;">
+
+    <h:form>
+    <p:growl autoUpdate="true"></p:growl>
+	<p:toolbar>
+  	<f:facet name="left"><p:outputLabel value="logo"/> </f:facet>
+  	<f:facet name="right"><p:commandButton value="logout"/>  </f:facet>
+  	</p:toolbar>
+  	</h:form>
+  	<div id = "container" style="width:100%;position:relative;">
+    <p:tabView  dynamic="true" style="width:100% ;position:relative;" prependId="false">
+    	<p:tab title="Candidates" >
+    		<p:panel id="candidates_container" style="border:none;position:relative;" >
+    	 	<h:form prependId="false" id="advanced_search_f">
+    	 	<p:toolbar style="position:relative">
+    	 	<f:facet name="left">
+            <p:commandButton value="advanced Search" onclick="$('#advanced_panel').slideToggle()"/>
+            <p:panel id="advanced_panel" style="width:100%; position:absolute; top:100% ; left:0px; z-index:1; display:none">
+    	 	     <div class="row">
+    	 	     	<div class="col-md-2">
+    	 	     	 <p:outputLabel value="required"   style="margin-right:10px"/>
+    	 	     	</div>
+    	 	     	<div class="col-md-10" id="required_panel">
+    	 	     	<p:panel styleClass="clearfix">
+    	 	     	<p:autoComplete style="width:200px;float:left" id="requiredVar" widgetVar="requiredVar" onkeydown="keyListener(event);changeLength(event)" 
+    	 	     	forceSelection="true"  completeMethod="#{candidateView.completeTag}" 
+    	 	     	onchange="addTag('requiredVar')"/>
+    	 	     	</p:panel>
+    	 	     	</div>
+    	 	     </div>
+    	 	    
+    	 	      <div class="row">
+    	 	     	<div class="col-md-2">
+    	 	     	 <p:outputLabel value="optional"   style="margin-right:10px"/>
+    	 	     	</div>
+    	 	     	<div class="col-md-10" id="required_panel">
+    	 	     	<p:panel styleClass="clearfix">
+    	 	     	<p:autoComplete style="width:200px;float:left" id="optionalVar" widgetVar="optionalVar" onkeydown="keyListener(event);changeLength(event)" 
+    	 	     	forceSelection="true"  completeMethod="#{candidateView.completeTag}" 
+    	 	     	onchange="addTag('optionalVar')"/>
+    	 	     	</p:panel>
+    	 	     	</div>
+    	 	     </div>
+    	 	       <div class="row">
+    	 	     	<div class="col-md-2">
+    	 	     	 <p:outputLabel value="excluded"   style="margin-right:10px"/>
+    	 	     	</div>
+    	 	     	<div class="col-md-10" id="required_panel">
+    	 	     	<p:panel styleClass="clearfix">
+    	 	     	<p:autoComplete style="width:200px;float:left" id="excludedVar" widgetVar="excludedVar" onkeydown="keyListener(event);changeLength(event)" 
+    	 	     	forceSelection="true"  completeMethod="#{candidateView.completeTag}" 
+    	 	     	onchange="addTag('excludedVar')"/>
+    	 	     	</p:panel>
+    	 	     	
+    	 	     	</div>
+    	 	     </div>
+    	 	     <div class="row">
+    	 	        <div class="col-md-2">
+    	 	     	<p:outputLabel value="Address" style="margin-right:10px"/>
+    	 	     	</div>
+    	 	     	<div class="col-md-10">
+    	 	     	<p:panel id ="address_panel" >
+    	 	     	<div class="row">
+    	 	     	<div class="col-sm-3">
+    	 	     		<p:selectOneMenu  value="#{candidateView.shape}" style="width:100%;margin-right:10px;" >
+    	 	     		 <f:selectItem  itemLabel="radius" itemValue="radius"/>
+    	 	     		 <f:selectItem itemLabel="rectangle" itemValue="rectangle"/>
+    	 	     		</p:selectOneMenu>
+    	 	     	</div>
+    	 	     	<div class="col-sm-3">	
+    	 	     		<p:selectOneMenu  value="#{candidateView.distance}" style="position:relative;width:100%;margin-right:10px">
+    	 	     			<f:selectItem itemLabel="5 miles" itemValue="5"/>
+    	 	     			<f:selectItem itemLabel="10 miles" itemValue="10"/>
+    	 	     			<f:selectItem itemLabel="15 miles" itemValue="15"/>
+    	 	     			<f:selectItem itemLabel="20 miles" itemValue="20"/>
+    	 	     			<f:selectItem itemLabel="25 miles" itemValue="25"/>
+    	 	     			<f:selectItem itemLabel="All" itemValue="All"/>
+    	 	     		</p:selectOneMenu>
+    	 	     	</div>
+    	 	     	<div class="col-sm-6">
+    	 	     		<p:autoComplete  style="width:100%;margin-right:10px" value="#{candidateView.address}" placeholder="address" completeMethod="#{candidateView.completeAddress}" forceSelection="true"/>
+    	 	     	</div>
+    	 	     	</div>
+    	 	     	</p:panel>
+    	 	     	</div>
+    	 	       </div>    	 	     
+    	 	 </p:panel>
+    	 	</f:facet>
+    	 	<f:facet name="right">
+    	 	<p:commandButton value="action" />
+    	 	</f:facet>
+ 
+    	 	</p:toolbar>
+    	 	 </h:form>   
+    	 	 	 
+    	 	<h:form id="candidates_f" prependId="false">
+    	 	  <ui:decorate template="candidate_table.xhtml">
+    	 	   	<ui:param  name="id" value="candidates"></ui:param>
+    	 	   </ui:decorate>
+    	 	</h:form>
+    	 	</p:panel>
+    	</p:tab>
+    	
+    	
+    	<p:tab title="Job" >
+    	<p:panel >
+    	 <h:form  prependId="false" >
+    	  
+    	 	<p:inputText id="test" value="#{candidateView.autoCompleteVar}"/>
+    	 	<p:commandButton value="sumbit" actionListener="#{candidateView.test}" update="test"></p:commandButton>
+    	 	  <p:panel id="advanced_panel2" style="width:100%; position:absolute; top:100% ; left:0px; z-index:1;">
+    	 	   <div class="row" style="width:100%">
+    	 	        <div class="col-md-2">
+    	 	     	<p:outputLabel value="Address" style="margin-right:10px"/>
+    	 	     	</div>
+    	 	     	<div class="col-md-10">
+    	 	     	<p:panel id ="address_panel2" >
+    	 	     	<div class="row">
+    	 	     	<div class="col-sm-3">
+    	 	     		<p:selectOneMenu  value="#{candidateView.shape}" style="width:100%;margin-right:10px;" >
+    	 	     		 <f:selectItem  itemLabel="radius" itemValue="radius"/>
+    	 	     		 <f:selectItem itemLabel="rectangle" itemValue="rectangle"/>
+    	 	     		</p:selectOneMenu>
+    	 	     	</div>
+    	 	     	<div class="col-sm-3">	
+    	 	     		<p:selectOneMenu  value="#{candidateView.distance}" style="position:relative;width:100%;margin-right:10px">
+    	 	     			<f:selectItem itemLabel="5 miles" itemValue="5"/>
+    	 	     			<f:selectItem itemLabel="10 miles" itemValue="10"/>
+    	 	     			<f:selectItem itemLabel="15 miles" itemValue="15"/>
+    	 	     			<f:selectItem itemLabel="20 miles" itemValue="20"/>
+    	 	     			<f:selectItem itemLabel="25 miles" itemValue="25"/>
+    	 	     			<f:selectItem itemLabel="All" itemValue="All"/>
+    	 	     		</p:selectOneMenu>
+    	 	     	</div>
+    	 	     	<div class="col-sm-6">
+    	 	     		<p:autoComplete  style="width:100%;margin-right:10px" value="#{candidateView.address}" placeholder="address" completeMethod="#{candidateView.completeAddress}" forceSelection="true"/>
+    	 	     	</div>
+    	 	     	</div>
+    	 	     	</p:panel>
+    	 	     	</div>
+    	 	       </div>  
+    	 	       </p:panel>
+    	 </h:form>
+    	 </p:panel>
+    	</p:tab>
+    	
+    	
+        </p:tabView>
+
+    	<ui:decorate template="candDetail.xhtml">
+    		<ui:param name="id" value="candidates"></ui:param>
+    	</ui:decorate>
+
+    	</div>	
+
+</h:body>
+</html>

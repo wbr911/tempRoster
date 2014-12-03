@@ -1,0 +1,68 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:c="http://java.sun.com/jsp/jstl/core">
+
+<ui:composition>
+	<p:dataTable id="job_cand_t" selectionMode="single"
+		widgetVar="job_#{id}_cand_t" var="cand" value="#{job.candidates}"
+		rowKey="#{cand.id}" style="background-color:whitesmoke">
+
+		<ui:insert name="rowSelectAjax"></ui:insert>
+
+
+		<p:column headerText="id" style="width:8%" sortBy="#{cand.id}"
+			sortFunction="#{jobView.sortId}" filterMatchMode="contains">
+			<h:outputText value="#{cand.id}" />
+		</p:column>
+		<p:column headerText="name" sortBy="#{cand.name}">
+
+			<h:outputText value="#{cand.name}" />
+		</p:column>
+	
+		<p:column headerText="age" sortBy="#{cand.age}">
+			<h:outputText value="#{cand.age}" />
+		</p:column>
+
+		<p:column headerText="gender" sortBy="#{cand.gender}">
+			<h:outputText value="#{cand.gender}" />
+		</p:column>
+		<p:column headerText="education" sortBy="#{cand.education}"
+			sortFunction="#{candidateView.sortEducation}">
+
+			<h:outputText value="#{cand.education}" style="word-break:break-all;" />
+		</p:column>
+
+		<p:column headerText="address" sortBy="#{cand.address.des}">
+
+			<h:outputText value="#{cand.address.des}"
+				style="word-break:break-all;" />
+		</p:column>
+		<p:column headerText="phone" sortBy="#{cand.phone}">
+
+			<h:outputText value="#{cand.phone}" />
+		</p:column>
+		<p:column headerText="email" sortBy="#{cand.email}">
+
+			<h:outputText value="#{cand.email}" />
+		</p:column>
+
+		<p:column headerText="status" sortBy="#{cand.jobStatus}">
+
+			<h:outputText escape="false" value="#{cand.jobStatusLabel()}" />
+		</p:column>
+
+		<p:column headerText="Last Note" sortBy="#{cand.lastNote}" sortFunction="#{candidateView.sortDate}">
+
+			<h:outputText value="#{cand.lastNote}" />
+		</p:column>
+
+	</p:dataTable>
+
+</ui:composition>
+</html>

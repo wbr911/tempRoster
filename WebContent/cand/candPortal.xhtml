@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	  xmlns:h="http://java.sun.com/jsf/html"
+	  xmlns:f="http://java.sun.com/jsf/core"
+	  xmlns:ui="http://java.sun.com/jsf/facelets"
+	  xmlns:p="http://primefaces.org/ui"
+	  >
+<h:head>
+  <link rel="stylesheet" href="http://cdn.bootcss.com/bootstrap/3.2.0/css/bootstrap.min.css"/>
+
+  <!-- 可选的Bootstrap主题文件（一般不用引入） -->
+  <link href="data:text/css;charset=utf-8," data-href="http://cdn.bootcss.com/bootstrap/css/bootstrap-theme.min.css" rel="stylesheet" id="bs-theme-stylesheet"/>
+  <!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
+  <script src="http://cdn.bootcss.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+<SCRIPT type="text/javascript">
+$(function(){
+	
+	$('#acceptBtn').hide();
+	$('#acceptBtn').after($('#acceptBtn_in_portal'));
+	$('#acceptBtn').remove();
+	$('#refuseBtn').hide();
+	$('#refuseBtn').after($('#refuseBtn_in_portal'));
+	$('#refuseBtn').remove();
+	$('#hiddenRefreshBtn').click()
+});
+function removeChoicePanel(){
+	if($('#editableFlag').text()=="false"){
+	$('#choicePanel').remove();}
+			
+}
+var ajaxCheck = true;
+function checkAjaxStatus(){
+	if(ajaxCheck){
+		ajaxCheck = false;
+		$('#ajaxStatusCheckBtn').click();
+	}
+}
+
+function redirect(){
+	if($('#ajaxStatusLabel').text()=='wrong'){
+	 location.replace('http://localhost:9090/TempsRoster/candErrorPage.jsf');
+	}
+	else{
+		ajaxCheck= true;
+	}
+	
+}
+</SCRIPT>
+<meta charset="UTF-8"></meta>
+<title>Candidate Portal</title>
+</h:head>
+<body>
+<h:form prependId="false" id="msg_f">
+<p:commandButton style="display:none" id="hiddenRefreshBtn" actionListener="#{candPortal.updateMsg}" process="@this" update="msg,editableFlag" oncomplete="removeChoicePanel()"></p:commandButton>
+<p:messages   id="msg" showDetail="true" style="width:700px;margin:0px auto" autoUpdate="true"></p:messages>
+<p:outputLabel id="editableFlag" style="display:none" value="#{candPortal.editable}"></p:outputLabel>
+<p:growl id="growl" showDetail="true"></p:growl>
+ <p:commandButton id="ajaxStatusCheckBtn" style="display:none" process="@none" update="ajaxStatusLabel" oncomplete="redirect()"></p:commandButton>
+   <p:outputLabel id="ajaxStatusLabel" style="display:none" value="#{ajaxBean.ajaxStatus}"></p:outputLabel>
+</h:form>
+<p:ajaxStatus onstart="checkAjaxStatus()"
+/> 
+ <h:form >
+<ui:decorate template="../user/emailTemplate.xhtml"><ui:param name="job" value="#{candPortal.job}"></ui:param> </ui:decorate>
+    <div style="display:none">
+    <label id="acceptBtn_in_portal" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#acceptModal">accept</label>
+    <label id="refuseBtn_in_portal" class="btn btn-warning btn-lg" data-toggle="modal" data-target="#refuseModal">refuse</label>             
+    </div>
+</h:form>
+<div class="modal fade" id="acceptModal" tabindex="-1" role="dialog" aria-labelledby="acceptModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><span class="sr-only">Close</span></button>
+        <h4 class="modal-title" id="acceptModalLabel">confirmation</h4>
+      </div>
+      <div class="modal-body">
+        are you sure to accept this job
+      </div>
+      <h:form>
+      <div class="modal-footer">
+        <p:commandLink actionListener="#{candPortal.accept}" update="@([id=msg_f])" oncomplete="removeChoicePanel()"><button type="button" class="btn btn-primary" data-dismiss="modal">accept</button></p:commandLink>
+        <button type="button" class="btn btn-default" data-dismiss="modal">cancel</button>
+      </div>
+      </h:form>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="refuseModal" tabindex="-1" role="dialog" aria-labelledby="refuseModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><span class="sr-only">Close</span></button>
+        <h4 class="modal-title" id="refuseModalLabel">confirmation</h4>
+      </div>
+      <div class="modal-body">
+        are you sure to refuse this job
+      </div>
+      <h:form>
+      <div class="modal-footer">
+        <p:commandLink actionListener="#{candPortal.refuse}" update="@([id=msg_f])" oncomplete="removeChoicePanel()"><button type="button" class="btn btn-primary" data-dismiss="modal">refuse</button></p:commandLink>
+        <button type="button" class="btn btn-default" data-dismiss="modal">cancel</button>
+      </div>
+      </h:form>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

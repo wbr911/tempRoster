@@ -1,0 +1,514 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+<ui:composition>
+	<h:form id="jobView_f" prependId="false">
+		<p:growl id="msg_in_job" showDetail="true"></p:growl>
+		<div class="panel my-panel clearfix">
+
+			<div class="left">
+				<p:commandLink id="jobView_refresh_btn" process="@this"
+					update="@form" oncomplete="updateTable('job_t')">
+					<label class="btn"><span
+						class="glyphicon glyphicon-refresh" /> refresh</label>
+				</p:commandLink>
+			</div>
+
+			<div class="left">
+				<p:commandLink id="jobView_add_btn" process="@this"
+					update="@([id=addJobModal])" actionListener="#{jobView.initNewJob}"
+					oncomplete="PF('addJobModal').show();$('#addJobModal').css('top','10px')">
+					<label class="btn"><span class="glyphicon glyphicon-plus" />add</label>
+				</p:commandLink>
+			</div>
+			<div class="left">
+				<p:commandLink id="jobView_delete_btn"
+					actionListener="#{jobView.deleteJob}" oncomplete="$('#jobView_refresh_btn').click()" update="msg_in_job">
+					<label class="btn"><span class="glyphicon glyphicon-trash" />delete</label>
+					<p:confirm header="Delete Confirm" message="Sure to delete the job"
+						icon="ui-icon-alert"></p:confirm>
+				</p:commandLink>
+			</div>
+			<div class="left">
+				<p:commandLink process="@form"
+				
+					actionListener="#{jobView.submitCheck}"
+					update="@([id=submitConfirmDialog]),@([id=msg_in_job])"
+					oncomplete="PF('submitConfirmDialog').show(); $('#submitConfirmDialog').css('top','23%');
+					$('#submitConfirmDialog').css('position','fixed'); initSubmitConfitmDilaog()">
+					<label class="btn"><span
+						class="glyphicon glyphicon-envelope" />submit</label>
+				</p:commandLink>
+			
+
+			</div>
+			<div class="right">
+				<label class="btn btn-danger" onclick="clearJobTable()">clear</label>
+			</div>
+		</div>
+
+		<p:dataTable value="#{jobView.jobList}" var="job" id="job_t"
+			selection="#{jobView.selectedJobList}" rowKey="#{job.id}"
+			widgetVar="job_t" rowExpandMode="single">
+
+			<p:ajax event="rowToggle" listener="#{jobView.clearNewTag}"
+				update="job_t" oncomplete="requirement_label_init()"></p:ajax>
+			<p:ajax event="rowSelect" listener="#{jobView.onRowSelect}" />
+			<p:column selectionMode="multiple" style="width:36px;" />
+			<p:column style="width:0px;">
+				<p:rowToggler />
+			</p:column>
+			<p:column style="width:36px">
+				<p:commandLink onclick="$(this).parents('td').click()"
+					update="@([id=editJobDialog])"
+					oncomplete="PF('editJobDialog').show();$('#editJobDialog').css('top','10px')">
+					<span class="glyphicon glyphicon-edit"></span>
+				</p:commandLink>
+			</p:column>
+			<p:column headerText="id" style="width:5%" sortBy="#{job.id}"
+				sortFunction="#{jobView.sortId}" filterBy="#{job.id}"
+				filterMatchMode="contains">
+				<f:facet name="filter">
+					<p:inputText style="width:90%" onchange="PF('job_t').filter()">
+					</p:inputText>
+				</f:facet>
+
+				<h:outputText value="#{job.id}"></h:outputText>
+			</p:column>
+
+			<p:column headerText="title" sortBy="#{job.title}"
+				filterBy="#{job.title}" filterMatchMode="exact">
+				<f:facet name="filter">
+					<p:selectOneMenu widgetVar="jobTitleFilter" style="width:100%"
+						onchange="PF('job_t').filter()" filter="true">
+						<f:selectItem itemLabel="Select One" value="#{null}"
+							noSelectionOption="true"></f:selectItem>
+						<f:selectItems value="#{titleDao.titleList}" var="title"
+							itemLabel="${title}" itemValue="${title}" />
+					</p:selectOneMenu>
+				</f:facet>
+				<h:outputText value="#{job.title}"></h:outputText>
+			</p:column>
+			<p:column headerText="client" sortBy="#{job.client.name}"
+				filterBy="#{job.client.name}" filterMatchMode="exact">
+				<f:facet name="filter">
+					<p:selectOneMenu widgetVar="jobClientFilter"
+						onchange="PF('job_t').filter()" filter="true"
+						styleClass="fillWidth">
+						<f:selectItem itemLabel="Select One" itemValue="#{null}"
+							noSelectionOption="true"></f:selectItem>
+						<f:selectItems value="#{clientDao.allClients}" var="client"
+							itemLabel="#{client.name}" itemValue="#{client.name}" />
+					</p:selectOneMenu>
+				</f:facet>
+				<h:outputText value="#{job.client.name}"></h:outputText>
+			</p:column>
+
+			<p:column headerText="amount" sortBy="#{job.amount}"
+				filterBy="#{job.amount}" filterMatchMode="gte">
+				<f:facet name="filter">
+					<p:inputText style="width:90%" onchange="PF('job_t').filter()" placeholder="&gt;=">
+						<f:converter converterId="javax.faces.Integer" />
+						<f:validateLength minimum="1"></f:validateLength>
+					</p:inputText>
+				</f:facet>
+				<h:outputText value="#{job.amount}"></h:outputText>
+
+			</p:column>
+			
+             <p:column headerText="progress" sortBy="#{job.progress}"
+				filterBy="#{job.progress}" filterMatchMode="lte">
+				<f:facet name="filter">
+					<p:inputText style="width:90%" onchange="PF('job_t').filter()" placeholder="&lt;=">
+						<f:converter converterId="javax.faces.Integer" />
+						<f:validateLongRange minimum="0" maximum="100"></f:validateLongRange>
+					</p:inputText>
+				</f:facet>
+				<h:outputText  escape="false" value="#{job.progressLabel}"></h:outputText>
+
+			</p:column>
+			
+			<p:column headerText="accepted" sortBy="#{job.accepted}"
+				filterBy="#{job.accepted}" filterMatchMode="gte">
+				<f:facet name="filter">
+					<p:inputText style="width:90%" onchange="PF('job_t').filter()" placeholder="&gt;=">
+						<f:converter converterId="javax.faces.Integer" />
+					</p:inputText>
+
+				</f:facet>
+				<h:outputText escape="false" value="#{job.acceptedLabel}"></h:outputText>
+			</p:column>
+			<p:column headerText="refused" sortBy="#{job.refused}"
+				filterBy="#{job.refused}" filterMatchMode="gte">
+				<f:facet name="filter">
+					<p:inputText style="width:90%" onchange="PF('job_t').filter()" placeholder="&gt;=">
+						<f:converter converterId="javax.faces.Integer" />
+					</p:inputText>
+
+				</f:facet>
+				<h:outputText escape="false" value="#{job.refusedLabel}"></h:outputText>
+			</p:column>
+
+			<p:column headerText="no response" sortBy="#{job.noResponse}"
+				filterBy="#{job.noResponse}" filterMatchMode="gte">
+				<f:facet name="filter">
+					<p:inputText style="width:90%" onchange="PF('job_t').filter()" placeholder="&gt;=">
+						<f:converter converterId="javax.faces.Integer" />
+					</p:inputText>
+
+				</f:facet>
+				<h:outputText value="#{job.noResponse}"></h:outputText>
+			</p:column>
+			<p:column headerText="create date" sortBy="#{job.startDate}"
+				filterBy="#{job.startDate}" filterMatchMode="contains">
+				<f:facet name="filter">
+					<p:inputText style="width:90%" onchange="PF('job_t').filter()">
+					</p:inputText>
+				</f:facet>
+				<h:outputText value="#{job.startDate}">
+					<f:convertDateTime pattern="MM/dd/yyyy"></f:convertDateTime>
+				</h:outputText>
+			</p:column>
+			<p:column headerText="status" sortBy="#{job.status}"
+				filterBy="#{job.status}" filterMatchMode="exact">
+				<f:facet name="filter">
+					<p:selectOneMenu widgetVar="jobStatusFilter"
+						onchange="PF('job_t').filter()" filter="true"
+						styleClass="fillWidth">
+						<f:selectItem itemLabel="Select One" itemValue="#{null}"
+							noSelectionOption="true" />
+						<f:selectItems value="#{jobView.jobStatusList}" var="status"
+							itemLabel="#{status}" itemValue="#{status}" />
+					</p:selectOneMenu>
+
+				</f:facet>
+				<h:outputText escape="false" value="#{job.statusLabel}"></h:outputText>
+			</p:column>
+			<p:rowExpansion>
+				<div style="background-color: #E7E6E6">
+					<p:tabView>
+						<p:tab title="requirement">
+							<p:panel>
+								<div class="panel">
+								<div class="left">
+								<p:commandLink onstart="fill_hidden_tagRequirement();parse_requirement_tags();fillSearchTag();" process="@parent:@parent" actionListener="#{jobView.searchFromJob}" update="@parent:@parent" 
+								oncomplete="$('#mainTabView').children('ul[role=tablist]').children('li:first').click();
+								$('#searchBtn').click()" >
+								<label class="btn btn-default">Search(update if changed)</label>				
+								</p:commandLink>
+								<p:commandLink onstart="fill_hidden_tagRequirement();parse_requirement_tags()" process="@parent:@parent" update="@([id=job_t])" actionListener="#{jobView.editTagRequirement}">
+								<label class="btn btn-default">Just update</label>
+								</p:commandLink>
+								</div>
+							    <div class="right" style="border:5px solid whitesmoke">
+								<label class="label label-primary" >required</label>
+								<label class="label label-info " >optional</label>
+								<label class="btn btn-default disabled" style="margin-left:5px;padding:3px 10px;color:black;opacity:1">ignored</label>
+								<span>click to switch</span>
+								<br/>
+								<label class="label label-danger " >excluded</label><span>Ctrl+click</span>
+								</div>
+								</div>
+								<br/>
+								<h:inputText id="hidden_searchTag_in_jobView" value="#{jobView.searchTags}" style="display:none"/>
+								<h:outputText id="requirement_des" escape="false" value="#{job.tagRequirement}"
+									autoResize="true"
+									style="width:100%; min-height:300px;max-height:30%" />
+                                <h:inputText style="display:none" value="#{job.tagRequirement}" id="hidden_tagRequirement"/>
+							</p:panel>
+						</p:tab>
+					    <p:tab title="candidates">
+							<ui:decorate template="job_candidate_table.xhtml">
+								<ui:param name="job" value="#{job}"></ui:param>
+								<ui:param name="id" value="#{job.id}"></ui:param>
+								<ui:define name="rowSelectAjax">
+									<p:ajax event="rowSelect" listener="#{candidateView.onRowSelect}"
+				                     update="@([id=candDetailDialogContent])"
+				                     oncomplete="showCandDetail()" />
+								</ui:define>
+							</ui:decorate>
+						</p:tab>
+						<p:tab title="conditions">
+							<ui:decorate template="settingTable.xhtml">
+								<ui:param name="job" value="#{job}"></ui:param>
+								<ui:param name="id" value="#{job.id}"></ui:param>
+							</ui:decorate>
+						</p:tab>
+						<p:tab title="contact">
+							<h:panelGrid columns="2">
+								<p:outputLabel value="Contact Person" />
+								<p:outputLabel value="#{job.client.contactName}"></p:outputLabel>
+
+								<p:outputLabel value="Email" />
+								<p:outputLabel value="#{job.client.email}"></p:outputLabel>
+
+								<p:outputLabel value="Phone" />
+								<p:outputLabel value="#{job.client.phone}"></p:outputLabel>
+							</h:panelGrid>
+						</p:tab>
+					</p:tabView>
+				</div>
+			</p:rowExpansion>
+		</p:dataTable>
+	</h:form>
+
+	<p:dialog header="editJobDialog" widgetVar="editJobDialog" modal="true"
+		id="editJobDialog" style="overflow-y:scroll;" showEffect="fade"
+		hideEffect="fade" width="1000px">
+		<h:form prependId="false" id="editJob_f">
+			<p:outputLabel value="ID" style="margin-right:10px" />
+			<p:outputLabel id="editJob_id" value="#{jobView.selectJob.id}" />
+			<p:inputText id="desChangedFlag" style="display:none" value="#{jobView.isDesChanged}"></p:inputText>
+			<p:panel id="editJobPanel" style="width:900px" styleClass="bg-info">
+				<h:panelGrid columns="3" style="width:100%"
+					columnClasses="table_label,table_input">
+					<p:outputLabel value="title" />
+					<p:selectOneMenu required="true" id="selectJob_title"
+						value="#{jobView.selectJob.title}" styleClass="fillWidth"
+						editable="true" filter="true">
+						<f:selectItems value="#{titleDao.titleList}" var="tilte"
+							itemLabel="#{title}" itemValue="#{title}"></f:selectItems>
+						<p:ajax listener="#{jobView.onTitleChanged}" process="@this"
+							update="selectJob_quotation,selectJob_salaries"></p:ajax>
+					</p:selectOneMenu>
+					<p:message for="selectJob_title" />
+
+					<p:outputLabel value="client" />					
+					<p:outputLabel id="selectJob_client" value="#{jobView.selectJob.client.name}"></p:outputLabel>
+					<p:message for="selectJob_client" />
+					<p:outputLabel value="amount" />
+					<p:inputText required="true" id="selectJob_amount"
+						value="#{jobView.selectJob.amount}" styleClass="fillWidth">
+						<f:converter converterId="javax.faces.Integer" />
+						<f:validateLongRange minimum="1" />
+					</p:inputText>
+					<p:message for="selectJob_amount" />
+				</h:panelGrid>
+				<br />
+				<p:outputLabel value="requirement" />
+				<br />
+				<p:editor  id="selectJob_requirement"
+					required="true" value="#{jobView.selectJob.des}" height="300"
+					autoResize="true" style="width:100%" onchange="$('#desChangedFlag').val('true')" />
+				<p:message for="selectJob_requirement" />
+                
+				<h:panelGrid columns="3" style="width:100%"
+					columnClasses="table_label,table_input">
+					<p:outputLabel value="quotation" />
+					<h:panelGroup style="width:100%">
+						<p:inputText required="true" id="selectJob_quotation"
+							value="#{jobView.selectJob.quotation}">
+							<f:converter converterId="javax.faces.Double">
+								<f:validateDoubleRange minimum="0.1"></f:validateDoubleRange>
+							</f:converter>
+						</p:inputText>
+						<span>/h</span>
+					</h:panelGroup>
+					<p:message for="selectJob_quotation" />
+					<p:outputLabel value="salaries" />
+					<h:panelGroup style="width:100%">
+						<p:inputText required="true" id="selectJob_salaries"
+							value="#{jobView.selectJob.salaries}">
+							<f:converter converterId="javax.faces.Double">
+								<f:validateDoubleRange minimum="0.1"></f:validateDoubleRange>
+							</f:converter>
+						</p:inputText>
+						<span>/h</span>
+					</h:panelGroup>
+					<p:message for="selectJob_salaries" />
+					<p:outputLabel value="maxHour" />
+					<p:inputText id="selectJob_maxHour"
+						value="#{jobView.selectJob.maxHour}" styleClass="fillWidth">
+						<f:converter converterId="javax.faces.Integer" />
+						<f:validateLongRange minimum="1"></f:validateLongRange>
+					</p:inputText>
+					<p:message for="selectJob_maxHour" />
+
+					<p:outputLabel value="beginDate" />
+					<p:calendar required="true" id="selectJob_beginDate"
+						value="#{jobView.selectJob.beginDate}" size="30"
+						pattern="MM/dd/yyyy" />
+					<p:message for="selectJob_beginDate" />
+
+					<p:outputLabel value="endDate" />
+					<p:calendar required="true" id="selectJob_endDate"
+						value="#{jobView.selectJob.endDate}" size="30"
+						pattern="MM/dd/yyyy" />
+					<p:message for="selectJob_endDate" />
+
+					<p:outputLabel value="Address" />
+					<p:inputText id="selectJob_Address"
+						value="#{jobView.selectJob.address.des}" styleClass="fillWidth">
+
+					</p:inputText>
+					<p:message for="selectJob_Address" />
+				</h:panelGrid>
+
+			</p:panel>
+
+			<div class="footerPanel">
+				<p:commandLink validateClient="true" styleClass="footerBtn" 
+					actionListener="#{jobView.editJob}" process="@form"
+					update="@form,@([id=jobView_f])"
+					oncomplete="if(args &amp;&amp; !args.validationFailed)PF('editJobDialog').hide()">
+					<button type="button" class="btn btn-primary">confirm</button>
+
+				</p:commandLink>
+				<button type="button" class="btn btn-default footerBtn"
+					onclick="PF('editJobDialog').hide()">cancel</button>
+			</div>
+			
+		</h:form>
+             
+	</p:dialog>
+
+
+
+	<p:dialog header="add job" widgetVar="addJobModal" modal="true"
+		id="addJobModal" style="overflow-y:scroll" showEffect="fade"
+		hideEffect="fade">
+		<h:form prependId="false" id="newJob_f">
+			<p:growl autoUpdate="true"></p:growl>
+			<p:outputLabel value="ID" style="margin-right:10px" />
+			<p:outputLabel id="newJob_id" value="#{jobView.newJob.id}" />
+			<p:panel id="addJobPanel" style="width:900px" styleClass="bg-info">
+				<h:panelGrid columns="3" style="width:100%"
+					columnClasses="table_label,table_input">
+					<p:outputLabel value="title" />
+					<p:selectOneMenu required="true" id="newJob_title"
+						value="#{jobView.newJob.title}" styleClass="fillWidth"
+						editable="true" filter="true">
+						<p:ajax listener="#{jobView.onTitleChanged}" process="@this"
+							update="quotation,salaries"></p:ajax>
+						<f:selectItems value="#{titleDao.titleList}" var="tilte"
+							itemLabel="#{title}" itemValue="#{title}"></f:selectItems>
+					</p:selectOneMenu>
+					<p:message for="newJob_title" />
+
+					<p:outputLabel value="client" />
+					<p:selectOneMenu required="true" id="newJob_client"
+						value="#{jobView.newJob.client}" styleClass="fillWidth"
+						filter="true" converter="clientConverter" >
+						<p:ajax listener="#{jobView.onClientChanged}" process="@this" update="Address"></p:ajax>
+						<f:selectItem itemValue="#{null}" itemLabel="Select One" noSelectionOption="true"/>
+						<f:selectItems value="#{clientDao.allClients}" var="client"
+							itemLabel="#{client.name}" itemValue="#{client}" />
+					</p:selectOneMenu>
+					<p:message for="newJob_client" />
+					<p:outputLabel value="amount" />
+					<p:inputText required="true" id="newJob_amount"
+						value="#{jobView.newJob.amount}" styleClass="fillWidth">
+						<f:converter converterId="javax.faces.Integer" />
+						<f:validateLongRange minimum="1" />
+					</p:inputText>
+					<p:message for="newJob_amount" />
+				</h:panelGrid>
+				<br />
+				<p:outputLabel value="requirement" />
+				<br />
+				<p:editor id="requirement" required="true"
+					value="#{jobView.newJob.des}" height="300" autoResize="true"
+					style="width:100%" />
+				<p:message for="requirement" />
+				<h:panelGrid columns="3" style="width:100%"
+					columnClasses="table_label,table_input">
+					<p:outputLabel value="quotation" />
+					<h:panelGroup style="width:100%">
+						<p:inputText required="true" id="quotation"
+							value="#{jobView.newJob.quotation}">
+							<f:converter converterId="javax.faces.Double">
+								<f:validateDoubleRange minimum="0.1"></f:validateDoubleRange>
+							</f:converter>
+						</p:inputText>
+						<span>/h</span>
+					</h:panelGroup>
+					<p:message for="quotation" />
+					<p:outputLabel value="salaries" />
+					<h:panelGroup style="width:100%">
+						<p:inputText required="true" id="salaries"
+							value="#{jobView.newJob.salaries}">
+							<f:converter converterId="javax.faces.Double">
+								<f:validateDoubleRange minimum="0.1"></f:validateDoubleRange>
+							</f:converter>
+						</p:inputText>
+						<span>/h</span>
+					</h:panelGroup>
+					<p:message for="salaries" />
+					<p:outputLabel value="maxHour" />
+					<p:inputText id="maxHour" value="#{jobView.newJob.maxHour}"
+						styleClass="fillWidth">
+						<f:converter converterId="javax.faces.Integer" />
+						<f:validateLongRange minimum="1"></f:validateLongRange>
+					</p:inputText>
+					<p:message for="maxHour" />
+
+					<p:outputLabel value="beginDate" />
+					<p:calendar required="true" id="beginDate"
+						value="#{jobView.newJob.beginDate}" size="30" pattern="MM/dd/yyyy" />
+					<p:message for="beginDate" />
+
+					<p:outputLabel value="endDate" />
+					<p:calendar required="true" id="endDate"
+						value="#{jobView.newJob.endDate}" size="30" pattern="MM/dd/yyyy" />
+					<p:message for="endDate" />
+
+					<p:outputLabel value="Address" />
+					<p:inputText id="Address" value="#{jobView.newJob.address.des}"
+						styleClass="fillWidth">
+
+					</p:inputText>
+					<p:message for="Address" />
+				</h:panelGrid>
+
+			</p:panel>
+
+			<div class="footerPanel">
+		
+				<p:commandLink validateClient="true" styleClass="footerBtn" 
+					actionListener="#{jobView.addJob}" process="@form"
+					update="@form"
+					oncomplete=";if(args &amp;&amp; !args.validationFailed){PF('addJobModal').hide();$('#jobView_refresh_btn').click()}">
+					<button type="button" class="btn btn-primary">Add</button>
+
+				</p:commandLink>
+				<p:commandLink styleClass="footerBtn"
+					actionListener="#{jobView.cancelAddJob}" process="@this"
+					update="@this" oncomplete="PF('addJobModal').hide()">
+					<button type="button" class="btn btn-default">cancel</button>
+				</p:commandLink>
+			</div>
+			
+		</h:form>
+			
+	</p:dialog>
+    	<p:dialog header="Confirm Dialog" id="submitConfirmDialog"
+					widgetVar="submitConfirmDialog" modal="true" height="150"
+					width="500">
+					<h:outputText
+						value="Sure to submit #{JobView.selectedJobSize()} jobs" />
+					<br />
+					<h:outputText id="jobSubmitMsg" escape="false" value="#{jobView.submitMsg}"></h:outputText>
+					<div class="footerPanel">
+						<p:commandLink styleClass="left" id="jobView_submit_btn" 
+							oncomplete="PF('submitConfirmDialog').hide();"
+							actionListener="#{jobView.submit}" update="@([id=job_t])" >
+							<label class="btn btn-default">submit</label>
+						</p:commandLink>
+						<div class="left">
+							<label class="btn btn-default"
+								onclick="PF('submitConfirmDialog').hide()">cancel</label>
+						</div>
+					</div>
+				
+				</p:dialog>
+</ui:composition>
+
+
+
+
+</html>

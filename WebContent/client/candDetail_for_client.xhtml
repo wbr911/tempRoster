@@ -1,0 +1,85 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+ xmlns:p="http://primefaces.org/ui">
+ 
+<ui:composition >
+    
+	<p:panel id="candDetailDialog" style="position:fixed ; top:43px ; width:40% ;display:none; max-width: 100%;min-width:320px ;overflow-y:scroll;padding:10px 20px" >
+      <p:panel styleClass="container-panel" id="candDetailDialogContent" >
+         <label id="candDetail_closeBtn" class="btn" onclick="closeCandDetail()"><span style="font-size:20px" class="glyphicon glyphicon-circle-arrow-right" ></span></label>
+       <p:panel id="candDetail" style="border:none; padding:0px 0px">
+       <p:outputLabel value="ID: #{cand.id}" style="font-size:1.5em" styleClass="text-primary"/>
+       <p:tabView  style="background:transparent;border:none;padding:0px 0px" prependId="false">
+        <p:tab title="detail">
+        <h:form prependId="false" id="detail_f" enctype="multipart/form-data">
+        <div class="row" style="position:relative">
+         <div id="picContainer" class="col-md-4">
+        
+         <p:graphicImage id="candDetailPic" styleClass="left" value="#{cand.pic}" width="100%"/>
+         </div>
+         <p:panel id="tagsContainer" styleClass="col-md-8" style="border:none;padding:0px 0px">
+         
+         <div class="row" >
+         <ui:repeat var="tag" value="#{cand.skills}">
+         	<p:outputLabel value="#{tag}" styleClass="label label-primary" style="float:left"><a class="glyphicon glyphicon-remove edit" style="color:white;" onclick="removeTag(this)"></a></p:outputLabel>
+         </ui:repeat>
+         </div>
+         <div class="row">
+         <ui:repeat var="tag" value="#{cand.certificates}">
+         	<p:outputLabel value="#{tag}" styleClass="label label-info" style="float:left"><a class="glyphicon glyphicon-remove edit" style="color:white;" onclick="removeTag(this)"></a></p:outputLabel>
+         </ui:repeat>
+         </div>
+         </p:panel>
+        </div> <!-- end of the pic and tag row -->
+ 
+        <!-- xxxxxxxxxxxxxxxxxxxxxxxxxxxx detail info xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+        <div class="row" >
+       
+      
+        <p:panel id="candDetailInfo" styleClass="bg-info" style="width:100%;font-size:15px" >
+        <h:panelGrid columns="3" style="width:100%" >
+        <p:outputLabel value="name"/>
+        <h:outputText styleClass="output_" value="#{cand.name}" />
+        <p:inputText styleClass="input_" value="#{cand.name}" style="width:100%" placeholder="name" />
+        <p:outputLabel value="title"/>
+        <h:outputText styleClass="output_" value="#{cand.title}" />
+        <p:inputText styleClass="input_" value="#{cand.title}" style="width:100%"/>
+        <p:outputLabel value="age"/>
+        <h:outputText styleClass="output_" value="#{cand.age}" />
+        <p:inputText styleClass="input_" value="#{cand.age}" style="width:100%"/>
+        <p:outputLabel value="phone"/>
+        <h:outputText styleClass="output_" value="#{cand.phone}" />
+        <p:inputText styleClass="input_" value="#{cand.phone}" style="width:100%"/>
+        <p:outputLabel value="email"/>
+        <h:outputText styleClass="output_" value="#{cand.email}" />
+        <p:inputText styleClass="input_" value="#{cand.email}" style="width:100%"/>
+        
+        <p:outputLabel value="address"/>
+        <h:outputText styleClass="output_" value="#{cand.address.des}" />
+        <p:inputText styleClass="input_" value="#{cand.address.des}" style="width:100%"/>
+        <p:outputLabel value="education"/>
+        
+         <h:outputText styleClass="output_" value="#{cand.education}" />
+         <p:inputText styleClass="input_" value="#{cand.education}" style="width:100%"/>
+         
+         </h:panelGrid> 
+         </p:panel>
+         </div>
+         </h:form>    
+        </p:tab>
+        <p:tab title="resume"></p:tab>
+        <h:outputText escape="false" value="#{cand.resume}"></h:outputText>
+       </p:tabView>
+       
+		</p:panel>
+    </p:panel>
+	</p:panel> 	
+     
+</ui:composition>
+</html>
+
+

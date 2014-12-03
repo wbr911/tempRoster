@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+ xmlns:p="http://primefaces.org/ui">
+<h:head>
+<link rel="stylesheet" href="http://cdn.bootcss.com/bootstrap/3.2.0/css/bootstrap.min.css"/>
+
+  <!-- 可选的Bootstrap主题文件（一般不用引入） -->
+  <link href="data:text/css;charset=utf-8," data-href="http://cdn.bootcss.com/bootstrap/css/bootstrap-theme.min.css" rel="stylesheet" id="bs-theme-stylesheet"/>
+  <!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
+  <script src="http://cdn.bootcss.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+  <script type="text/javascript">
+$(function(){
+	 $(window).keyup(function(e){
+		 if(e.keyCode==13){
+			 $('#loginBtn').click();
+			 
+		 }
+		 
+	 });
+});
+</script>
+<meta charset="UTF-8"></meta>
+<title>candidate login</title>
+</h:head>
+<h:body>
+ <h:form prependId="false">
+      <div style="margin:200px auto;width:300px">
+      	    <label style="width:100%;font-size:2em; text-align:center"><h:outputText  value="Candidate Portal"></h:outputText></label>
+      	    <br/>
+      		<p:inputText style="width:100%" value="#{candLogin.id}" placeholder="username"></p:inputText>
+      		<br/>
+      		<p:password style="width:100%" value="#{candLogin.pwd}" placeholder="password"></p:password>
+      		<br/>
+      		<p:messages style="width:100%" id="msg" showDetail="true"></p:messages>
+      	<p:commandLink  id="loginBtn" actionListener="#{candLogin.login}" update="msg" process="@form"><label style="width:100%" class="btn btn-primary">Login</label></p:commandLink>
+      </div>
+      </h:form>
+
+ 
+</h:body>
+</html>

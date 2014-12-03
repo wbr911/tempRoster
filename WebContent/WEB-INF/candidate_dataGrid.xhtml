@@ -1,0 +1,73 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+<ui:composition>
+	<h:form id="candidates_grid_f" prependId="false">
+		<p:commandButton id="candidates_grid_deleteBtn"
+			process="@([id=candidates_grid_f])"
+			actionListener="#{candidateView.deleteBatch}"
+			update="@([id=candidates_t])" style="display:none"></p:commandButton>
+		<p:dataGrid id="candidates_grid" widgetVar="candidates_grid"
+			var="cand" value="#{candidateView.candidates}" columns="3"
+			layout="grid">
+			<p:panel header="#{cand.id}" style="text-align:center">
+				<div class="row" style="position: relative">
+					<p:commandLink update="@([id=candDetail])"
+						actionListener="#{candidateView.showCandDetail}" title="View"
+						oncomplete="showCandDetail()" process="@this">
+						<label class="btn btn-primary"
+							style="margin: 0px; padding: 6px 6px"> <span
+							class="glyphicon glyphicon-search"></span></label>
+						<f:setPropertyActionListener
+							target="#{candidateView.selectedCand}" value="#{cand}"></f:setPropertyActionListener>
+					</p:commandLink>
+
+					<div id="picContainer" class="col-md-5">
+						<p:graphicImage value="#{cand.pic}" width="100%" />
+					</div>
+					<p:panel styleClass="col-md-7" style="border:none;">
+						<div class="row">
+							<a><span class="glyphicon glyphicon-edit"
+								style="margin-left: 5px; margin-bottom: 5px"
+								onclick="showTagsEditView()"></span></a>
+						</div>
+						<div class="row">
+							<ui:repeat var="tag" value="#{cand.skills}">
+								<p:outputLabel value="#{tag}" styleClass="label label-default"
+									style="float:left">
+									<a class="glyphicon glyphicon-remove edit"
+										style="color: white;" onclick="removeTag(this)"></a>
+								</p:outputLabel>
+							</ui:repeat>
+						</div>
+						<div class="row">
+							<ui:repeat var="tag" value="#{cand.certificates}">
+								<p:outputLabel value="#{tag}" styleClass="label label-default"
+									style="float:left">
+									<a class="glyphicon glyphicon-remove edit"
+										style="color: white;" onclick="removeTag(this)"></a>
+								</p:outputLabel>
+							</ui:repeat>
+						</div>
+						<div class="row">
+							<ui:repeat var="tag" value="#{cand.keywords}">
+								<p:outputLabel value="#{tag}" styleClass="label label-default"
+									style="float:left">
+									<a class="glyphicon glyphicon-remove edit"
+										style="color: white;" onclick="removeTag(this)"></a>
+								</p:outputLabel>
+							</ui:repeat>
+						</div>
+					</p:panel>
+				</div>
+			</p:panel>
+
+		</p:dataGrid>
+	</h:form>
+</ui:composition>
+</html>

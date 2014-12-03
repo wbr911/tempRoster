@@ -1,0 +1,48 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+<ui:composition>
+	<h:panelGrid columns="2" styleClass="fillWidth">
+		<p:outputLabel value="quotation" />
+		<h:panelGroup>
+			<p:outputLabel id="quotation" value="#{job.quotation}">
+				<span>/h</span>
+			</p:outputLabel>
+		</h:panelGroup>
+		<p:outputLabel value="salaries" />
+		<h:panelGroup>
+			<p:outputLabel id="salaries" value="#{job.salaries}">
+				<span>/h</span>
+			</p:outputLabel>
+		</h:panelGroup>
+
+		<p:outputLabel id="maxHour" value="maxHour" />
+		<p:outputLabel value="#{job.maxHour}">
+
+		</p:outputLabel>
+
+
+		<p:outputLabel id="beginDate" value="beginDate" />
+		<p:outputLabel value="#{job.beginDate}" styleClass="fillWidth">
+			<f:convertDateTime pattern="MM/dd/yyyy"></f:convertDateTime>
+		</p:outputLabel>
+
+
+		<p:outputLabel id="endDate" value="endDate" />
+		<p:outputLabel value="#{job.endDate}" styleClass="fillWidth"
+			pattern="MM/dd/yyyy">
+			<f:convertDateTime pattern="MM/dd/yyyy"></f:convertDateTime>
+		</p:outputLabel>
+
+		<p:outputLabel id="address" value="address" />
+		<p:outputLabel value="#{job.address.des}">
+		</p:outputLabel>
+	</h:panelGrid>
+
+</ui:composition>
+</html>

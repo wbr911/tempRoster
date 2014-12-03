@@ -1,0 +1,99 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+
+<ui:composition>
+<h:form>
+	<div class="panel my-panel clearfix">
+
+			<div class="left">
+				<p:commandLink id="clientView_refresh_btn" process="@this"
+					update="@form" oncomplete="updateTable('client_t')">
+					<label class="btn"><span
+						class="glyphicon glyphicon-refresh" /> refresh</label>
+				</p:commandLink>
+			</div>
+
+			<div class="left">
+				<p:commandLink id="clientView_add_btn" process="@this"
+					update="@([id=addJobModal])" actionListener="#{jobView.initNewJob}"
+					oncomplete="PF('addJobModal').show();$('#addJobModal').css('top','10px')">
+					<label class="btn"><span class="glyphicon glyphicon-plus" />add</label>
+				</p:commandLink>
+			</div>
+			<div class="left">
+				<p:commandLink id="jobView_delete_btn"
+					actionListener="#{jobView.deleteJob}" oncomplete="$('#jobView_refresh_btn').click()" update="msg_in_job">
+					<label class="btn"><span class="glyphicon glyphicon-trash" />delete</label>
+					<p:confirm header="Delete Confirm" message="Sure to delete the job"
+						icon="ui-icon-alert"></p:confirm>
+				</p:commandLink>
+			</div>
+			<div class="left">
+				<p:commandLink process="@form"
+				
+					actionListener="#{jobView.submitCheck}"
+					update="@([id=submitConfirmDialog]),@([id=msg_in_job])"
+					oncomplete="PF('submitConfirmDialog').show(); $('#submitConfirmDialog').css('top','23%');
+					$('#submitConfirmDialog').css('position','fixed'); initSubmitConfitmDilaog()">
+					<label class="btn"><span
+						class="glyphicon glyphicon-envelope" />submit</label>
+				</p:commandLink>
+			
+
+			</div>
+			<div class="right">
+				<label class="btn btn-danger" onclick="clearJobTable()">clear</label>
+			</div>
+		</div>
+		<p:dataTable id="client_t" value="#{client.clientList}" var="client" rowKey="#{client.id}" selection="#{client.selectedClient}">
+		<p:column selectionMode="multiple" style="width:36px;" />
+			<p:column headerText="name" sortBy="#{client.name}"
+				sortFunction="#{client.name}" filterBy="#{client.name}"
+				filterMatchMode="contains">
+				<f:facet name="filter">
+					<p:inputText style="width:90%" onchange="PF('job_t').filter()">
+					</p:inputText>
+				</f:facet>
+                     
+				<h:outputText value="#{client.name}"></h:outputText>
+			</p:column>
+			<p:column headerText="contact" sortBy="#{client.contact}"
+				sortFunction="#{client.contact}" filterBy="#{client.contact}"
+				filterMatchMode="contains">
+				<f:facet name="filter">
+					<p:inputText style="width:90%" onchange="PF('job_t').filter()">
+					</p:inputText>
+				</f:facet>
+                     
+				<h:outputText value="#{client.contact}"></h:outputText>
+			</p:column>
+			<p:column headerText="email" sortBy="#{client.email}"
+				sortFunction="#{client.contact}" filterBy="#{client.email}"
+				filterMatchMode="contains">
+				<f:facet name="filter">
+					<p:inputText style="width:90%" onchange="PF('job_t').filter()">
+					</p:inputText>
+				</f:facet>
+                     
+				<h:outputText value="#{client.email}"></h:outputText>
+			</p:column>
+			<p:column headerText="phone" sortBy="#{client.phone}"
+				sortFunction="#{client.phone}" filterBy="#{client.contact}"
+				filterMatchMode="contains">
+				<f:facet name="filter">
+					<p:inputText style="width:90%" onchange="PF('job_t').filter()">
+					</p:inputText>
+				</f:facet>
+                     
+				<h:outputText value="#{client.contact}"></h:outputText>
+			</p:column>
+			
+		</p:dataTable>
+</h:form>	
+</ui:composition>
+</html>

@@ -1,0 +1,40 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core">
+
+<ui:composition>
+	<div style="margin: 0px auto; font-size: 0.9em" class="clearfix">
+		<div
+			style="background-image: url(/TempsRoster/img/iphone.PNG); background-size: cover; background-repeat: no-repeat; padding: 120px 20px 0px 45px; height: 600px; width: 300px;">
+			<div class="panel panel-default SMS-bubble"
+				style="position: relative; width: 200px; display: block; word-break: break-all; background-color: #E6E6E6; border-radius: 10px">
+				##
+				<h:outputText value="#{candidateView.selectJob.title}" />
+				## <br /> offered by <br /> ##
+				<h:outputText value="#{candidateView.selectJob.client.name}"></h:outputText>
+				## <br /> ------------------------------ <br /> ##Salaries## <br />
+				<h:outputText value="#{candidateView.selectJob.salaries}" />
+				<br /> ##date## <br />
+				<h:outputText value="#{candidateView.selectJob.beginDate}">
+					<f:convertDateTime pattern="MM/dd/yyyy"></f:convertDateTime>
+				</h:outputText>
+				~
+				<h:outputText value="#{candidateView.selectJob.endDate}">
+					<f:convertDateTime pattern="MM/dd/yyyy"></f:convertDateTime>
+				</h:outputText>
+				<br /> you can get more details and send feedback by the URL delow:
+				<br />
+				<h:link style="text-decoration:underline !important;color:#0088CC"
+					value="http://tempsPortal.EasyTemps.com?id=xxxx&amp;key=xxxx"></h:link>
+				<br /> ------------------------------ <br /> [from] <br />
+				<h:outputText value="#{applicationView.companyName}" />
+				<br />
+			</div>
+		</div>
+	</div>
+</ui:composition>
+</html>

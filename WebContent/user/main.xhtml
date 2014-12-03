@@ -1,0 +1,288 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+<h:head>
+	<link rel="stylesheet"
+		href="http://cdn.bootcss.com/bootstrap/3.2.0/css/bootstrap.min.css" />
+	<link href="../css/myCss.css" rel="stylesheet" type="text/css" />
+
+	<!-- 可选的Bootstrap主题文件（一般不用引入） -->
+	<link href="data:text/css;charset=utf-8,"
+		data-href="http://cdn.bootcss.com/bootstrap/css/bootstrap-theme.min.css"
+		rel="stylesheet" id="bs-theme-stylesheet" />
+	<!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
+	<script
+		src="http://cdn.bootcss.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+	<script src="../js/myJs.js " />
+	<title>Easy Temporary Employment</title>
+
+</h:head>
+<h:body style="font-size:1.4em;">
+
+	<h:form prependId="false" id="header_f">
+		<p:growl id="msg_in_main" showDetail="true" autoUpdate="false"></p:growl>
+		<div class="panel my-header clearfix">
+			<div class="left">
+				<span style="color: white">Easy Temporary Employment </span>
+			</div>
+			<div class="left">
+				<label class="label "
+					style="background-color: #d4d4d4; color: black" id="newAcceptLabel">new
+					accepted <h:outputText id="newAcceptNumber"
+						value="#{jobDao.newAccept}"></h:outputText>
+				</label>
+			</div>
+			<div class="left">
+
+				<label class="label" style="background-color: #d4d4d4; color: black"
+					id="newRefuseLabel">new refused <h:outputText
+						id="newRefuseNumber" value="#{jobDao.newRefuse}"></h:outputText></label>
+			</div>
+			<p:commandButton id="hiddenHeaderRefreshBtn" style="display:none"
+				actionListener="#{candidateView.updateHeader}" update="@form"
+				oncomplete="updateHeader()" />
+			<p:commandButton id="hiddenHeaderClearBtn" style="display:none"
+				actionListener="#{candidateView.clearHeader}" update="@form"
+				oncomplete="updateHeader()" />
+
+			<div class="right">
+				<p:commandLink action="#{candidateView.logout}">
+					<span style="color: white">Logout</span>
+				</p:commandLink>
+			</div>
+			<div class="right" style="margin-right: 20px">
+				<span class="glyphicon glyphicon-user" style="color: whitesmoke" />
+				<h:outputText style="color:whitesmoke"
+					value="#{candidateView.user.name}" />
+			</div>
+			<div class="right">
+			 <p:commandButton id="ajaxStatusCheckBtn" style="display:none" process="@none" update="ajaxStatusLabel" oncomplete="redirect()"></p:commandButton>
+			 <p:outputLabel id="ajaxStatusLabel" value="#{ajaxBean.ajaxStatus}"></p:outputLabel>
+
+			</div>
+		</div>
+
+	</h:form>
+	<div id="container" style="width: 100%; position: relative;">
+		<p:tabView id="mainTabView" style="width:100% ;position:relative;"
+			prependId="false">
+			<p:tab title="Candidates">
+			   <h:form prependId="false">
+			   <p:panel id="searchLabel" styleClass="bg-info" style="display:none">
+						<h:outputLabel escape="false" value="#{candidateView.searchLabel}" />
+						<h:outputText id="searchTags" style="display:none" value="#{candidateView.searchTags}" />
+					</p:panel>
+			   </h:form>
+				<h:form prependId="false" id="advanced_search_f">
+
+					<p:toolbar style="position:relative">
+						<f:facet name="left">
+							<label id="advancedSearchBtn"
+								onclick="$('#advanced_panel').slideToggle();$('#requiredVar_input').focus();"
+								class="btn btn-primary">Advanced Search</label>
+							<p:commandLink id="refreshBtn" onstart="PF('mainViewBlock').show()"
+								actionListener="#{candidateView.refresh}"
+								update="@([id=candidates_f])" process="@this"
+								oncomplete="PF('candidates_t').filter();PF('mainViewBlock').hide()">
+								<label class="btn"><span
+									class="glyphicon glyphicon-refresh"></span>Refresh</label>
+							</p:commandLink>
+							<p:commandLink id="favourite" process="@this">
+								<label class="btn"><span
+									class="glyphicon glyphicon-star-empty"></span>Favorites</label>
+							</p:commandLink>
+							<ui:decorate template="favourite.xhtml" >
+								<ui:param name="favouriteList"
+									value="#{candidateView.favouriteList}"></ui:param>
+							</ui:decorate>
+							<p:commandLink process="@this"
+								actionListener="#{candidateView.initNewCand}"
+								update="@([id=candDetailDialog])"
+								oncomplete="showCreateCandView()">
+								<label id="createBtn" class="btn"><span
+									class="glyphicon glyphicon-plus"></span>add</label>
+							</p:commandLink>
+							<label id="trashBtn" class="btn"
+								onclick="$('#candidates_t_deleteBtn').click();"> <span
+								class="glyphicon glyphicon-trash"></span>delete
+							</label>
+							<p:panel id="advanced_panel"
+								style="width:100%; position:absolute; top:100% ; left:0px; z-index:1;display:none">
+								<p:tabView prependId="false">
+									<p:tab title="search">
+										<div class="row">
+											<p:inputText type="hidden" id="hiddenSearchTag"
+												value="#{candidateView.searchTags}"></p:inputText>
+											<div class="col-md-2">
+												<p:outputLabel value="required" style="margin-right:10px" />
+												<span style="font-weight:normal">(must have)</span>
+											</div>
+											<div class="col-md-10" id="required_panel"
+												onclick="$('#requiredVar_input').focus()">
+												<p:panel styleClass="clearfix">
+													<p:autoComplete forceSelection="true" style="width:20px;float:left"
+														id="requiredVar" widgetVar="requiredVar"
+														onkeydown="keyListener(event);changeLength(event)"
+														completeMethod="#{candidateView.completeTag}"
+														onchange="addTag('requiredVar')" placeholder=">>" />
+												</p:panel>
+											</div>
+										</div>
+										<div class="row">
+											<div class="col-md-2">
+												<p:outputLabel value="optional" style="margin-right:10px" />
+  											    <span style="font-weight:normal">(the more,the higher rank)</span>
+											</div>
+											<div class="col-md-10" id="required_panel"
+												onclick="$('#optionalVar_input').focus()">
+												<p:panel styleClass="clearfix">
+													<p:autoComplete style="width:20px;float:left"
+														id="optionalVar" widgetVar="optionalVar"
+														onkeydown="keyListener(event);changeLength(event)"
+														forceSelection="true"
+														completeMethod="#{candidateView.completeTag}"
+														onchange="addTag('optionalVar')" placeholder=">>" />
+												</p:panel>
+											</div>
+										</div>
+										<div class="row">
+											<div class="col-md-2">
+												<p:outputLabel value="excluded" style="margin-right:10px" />
+												<span style="font-weight:normal">(must not have)</span>
+											</div>
+											<div class="col-md-10" id="required_panel"
+												onclick="$('#excludedVar_input').focus()">
+												<p:panel styleClass="clearfix">
+													<p:autoComplete style="width:20px;float:left"
+														id="excludedVar" widgetVar="excludedVar"
+														onkeydown="keyListener(event);changeLength(event)"
+														forceSelection="true"
+														completeMethod="#{candidateView.completeTag}"
+														onchange="addTag('excludedVar')" placeholder=">>" />
+												</p:panel>
+
+											</div>
+										</div>
+										<div class="row" style="display: none">
+											<div class="col-md-2">
+												<p:outputLabel value="Address" style="margin-right:10px" />
+											</div>
+											<div class="col-md-10">
+												<p:panel id="address_panel">
+													<p:selectOneMenu value="#{candidateView.shape}"
+														style="width:20%;max-width:100px;margin-right:10px;">
+														<f:selectItem itemLabel="radius" itemValue="radius" />
+														<f:selectItem itemLabel="rectangle" itemValue="rectangle" />
+													</p:selectOneMenu>
+													<p:selectOneMenu value="#{candidateView.distance}"
+														style="width:20%;max-width:100px;margin-right:10px">
+														<f:selectItem itemLabel="5 miles" itemValue="5" />
+														<f:selectItem itemLabel="10 miles" itemValue="10" />
+														<f:selectItem itemLabel="15 miles" itemValue="15" />
+														<f:selectItem itemLabel="20 miles" itemValue="20" />
+														<f:selectItem itemLabel="25 miles" itemValue="25" />
+														<f:selectItem itemLabel="All" itemValue="All" />
+													</p:selectOneMenu>
+													<p:autoComplete style="width:50%;margin-right:10px"
+														value="#{candidateView.address}" placeholder="address"
+														completeMethod="#{candidateView.completeAddress}"
+														forceSelection="true" />
+
+												</p:panel>
+											</div>
+										</div>
+										<div class="row" style="margin-top: 30px">
+											<div class="col-sm-2 col-md-2  col-lg-2 ">
+												<p:commandLink id="searchBtn"
+													actionListener="#{candidateView.advancedSearch}"
+													onstart="parseSearchTag()" process="@form" update="@([id=searchLabel]),@([id=recentContainer]),@([id=candidates_t])"
+													oncomplete="$('#advanced_panel').slideUp();updateTable('candidates_t');$('#searchLabel').slideDown()">
+													<label class="btn btn-lg btn-primary"
+														style="min-width: 100px; display: block; margin-bottom: 30px">Search
+														(ctrl+enter)</label>
+												</p:commandLink>
+											</div>
+											<div class="col-sm-2 col-md-2 col-lg-2">
+												<label class="btn  btn-lg btn-danger"
+													style="min-width: 100px; display: block"
+													onclick="remove_searchView_tags()">Clear</label>
+											</div>
+										</div>
+									</p:tab>
+									<!-- end of search tab -->
+									<p:tab id="rencentSearchTab" title="recent search">
+									    <p:panel id="recentContainer" styleClass="panel-container">
+										<ul class="myList">
+										<ui:repeat var="record" value="#{candidateView.recentSeachList}">
+										<li>
+											    <p:commandLink process="@this" update="@this" oncomplete="clickNext($(this))" >
+											    <f:setPropertyActionListener target="#{candidateView.selectedRecent}" value="#{record}"/>
+
+											    <p:panel styleClass="clearfix" style="padding:5px !important; background-color:#f5f5f5">
+													<label style="float:left;margin-right:20px"><h:outputText value="#{record.name}"/></label>
+													<h:outputText escape="false" value="#{record.des}"></h:outputText>
+												</p:panel>
+											    </p:commandLink>
+												<p:commandLink style="display:none" process="@this"
+												actionListener="#{candidateView.chooseRecent}" update="@([id=searchLabel]),@form"
+												oncomplete="updateTable('candidates_t'); fillSearchTag();$('#searchLabel').slideDown()">
+												</p:commandLink>
+										</li>
+										</ui:repeat>
+  									  </ul>
+  									  </p:panel>
+									</p:tab>
+								</p:tabView>
+							</p:panel>
+						</f:facet>
+						<f:facet name="right">
+							<p:commandLink id="ClearTableBtn"
+								actionListener="#{candidateView.clear}"
+								update="@([id=candidates_f])" process="@this"
+								oncomplete="clearTable();remove_searchView_tags();$('#advanced_panel').slideUp()">
+								<label class="btn btn-danger">Clear</label>
+							</p:commandLink>
+						</f:facet>
+					</p:toolbar>
+				</h:form>
+				<ui:decorate template="candidate_table.xhtml">
+					<ui:param name="type" value="cand"></ui:param>
+					<ui:param name="id" value="candidates"></ui:param>
+				</ui:decorate>
+			</p:tab>
+			<p:tab title="Job">
+				<ui:decorate template="jobView.xhtml">
+				</ui:decorate>
+			</p:tab>
+		</p:tabView>
+		<ui:decorate template="candDetail.xhtml">
+			<ui:param name="id" value="candidates"></ui:param>
+		</ui:decorate>
+	</div>
+	<h:form id="msgDialog_f" prependId="false">
+		<ui:decorate template="msgDialog.xhtml">
+			<ui:param name="job" value="#{candidateView.selectJob}"></ui:param>
+		</ui:decorate>
+	</h:form>
+	<p:ajaxStatus onstart="PF('ajaxLoading').show();checkAjaxStatus()"
+		onsuccess="PF('ajaxLoading').hide()" />
+
+	<p:dialog style="background-color:#003366" id="ajaxLoading" widgetVar="ajaxLoading" draggable="false" closable="false" resizable="false" showHeader="false">
+		<p:graphicImage value="/gif/ajax-loader2.gif"
+			style="width:50px;z-index:2000 !important" />
+
+	</p:dialog>
+	<p:blockUI block="mainTabView" widgetVar="mainViewBlock" ></p:blockUI>
+	<p:confirmDialog global="true">
+		<p:commandButton value="Yes" type="button"
+			styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+		<p:commandButton value="No" type="button"
+			styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+	</p:confirmDialog>
+
+</h:body>
+</html>

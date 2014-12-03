@@ -1,0 +1,60 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+<ui:composition>
+	<h:panelGrid columns="3">
+		<p:outputLabel value="ID" />
+		<p:outputLabel value="#{candidateView.newCand.id}" />
+		<p:outputLabel value="" />
+
+		<p:outputLabel value="title" />
+		<p:inputText id="newCandTitle" value="#{candidateView.newCand.title}" />
+		<p:message for="newCandTitle" />
+
+		<p:outputLabel value="name" />
+		<p:inputText id="newCandName" value="#{candidateView.newCand.name}" />
+		<p:message for="newCandName" />
+
+
+		<p:outputLabel value="age" />
+		<p:inputText id="newCandAge" value="#{candidateView.newCand.age}">
+			<f:converter converterId="javax.faces.Integer" />
+		</p:inputText>
+		<p:message for="newCandAge" />
+
+		<p:outputLabel value="gender" />
+		<p:selectOneMenu id="newCandGender"
+			value="#{candidateView.newCand.gender}">
+			<f:selectItem itemLabel="male" itemValue="M"></f:selectItem>
+			<f:selectItem itemLabel="female" itemValue="F"></f:selectItem>
+		</p:selectOneMenu>
+		<p:message for="newCandGender" />
+
+		<p:outputLabel value="phone" />
+		<p:inputText id="newCandPhone" value="#{candidateView.newCand.phone}" />
+		<p:message for="newCandPhone" />
+
+		<p:outputLabel value="email" />
+		<p:inputText id="newCandPhone" value="#{candidateView.newCand.phone}" />
+		<p:message for="newCandPhone" />
+
+		<p:outputLabel value="address" />
+		<p:inputText id="newCandAddress"
+			value="#{candidateView.newCand.address}" />
+		<p:message for="newCandAddress" />
+
+
+
+
+		<p:outputLabel value="education" />
+		<p:inputText id="newCandEducation"
+			value="#{candidateView.newCand.Education}" />
+		<p:message for="newCandEducation" />
+	</h:panelGrid>
+</ui:composition>
+</html>

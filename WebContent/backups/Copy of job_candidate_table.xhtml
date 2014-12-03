@@ -1,0 +1,69 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:c="http://java.sun.com/jsp/jstl/core">
+    
+<ui:composition>
+       <p:dataTable id="job_cand_t" widgetVar="job_#{id}_cand_t" var="cand" value="#{job.candidates}" rowKey="#{cand.id}" >
+     
+		<p:column selectionMode="multiple" style="width:36px;" />
+			<p:column style="width:52px;text-align: center">
+             <p:commandLink update="@([id=candDetail])"  title="View" oncomplete="showCandDetail()"  process="@this">
+             <f:setPropertyActionListener value="#{cand}" target="#{candidateView.selectedCand}" />
+             <label class="btn btn-primary" style="margin:0px; padding:6px 6px"> <span class="glyphicon glyphicon-search"></span></label>
+            </p:commandLink>
+            </p:column>
+			<p:column headerText="id" style="width:8%" filterBy="#{cand.id}" sortBy="#{cand.id}" sortFunction="#{candidateView.sortId}" filterMatchMode="contains">
+				<f:facet name="filter">
+          			<p:inputText style="width:90%" onchange="PF('job_#{id}_cand_t').filter()"> </p:inputText>
+          		</f:facet>
+				<h:outputText value="#{cand.id}"/>
+			</p:column>
+			<p:column headerText="name" filterBy="#{cand.name}" sortBy="#{cand.name}" >
+			    <f:facet name="filter">
+          			<p:inputText style="width:90%" onchange="PF('#{id}_t').filter()"> </p:inputText>
+          	    </f:facet>
+				<h:outputText value="#{cand.name}"/>
+			</p:column>
+			<p:column headerText="job title" filterBy="#{cand.title}" sortBy="#{cand.title}">
+				<f:facet name="filter">
+          			<p:inputText style="width:90%" onchange="PF('#{id}_t').filter()"> </p:inputText>
+          	    </f:facet>
+				<h:outputText value="#{cand.title}"/>
+			</p:column>
+			<p:column headerText="phone" filterBy="#{cand.phone}" sortBy="#{cand.phone}">
+			    <f:facet name="filter">
+          			<p:inputText style="width:90%" onchange="PF('#{id}_t').filter()"> </p:inputText>
+          	    </f:facet>
+				<h:outputText value="#{cand.phone}"/>
+			</p:column>
+			<p:column headerText="email" filterBy="#{cand.email}" sortBy="#{cand.email}">
+				<f:facet name="filter">
+          			<p:inputText style="width:90%" onchange="PF('#{id}_t').filter()"> </p:inputText>
+          	    </f:facet>
+				<h:outputText value="#{cand.email}"/>
+			</p:column>
+			
+            <p:column headerText="status" filterBy="#{cand.jobStatus}"  sortBy="#{cand.jobStatus}">
+				<f:facet name="filter">
+          			<p:inputText style="width:90%" onchange="PF('#{id}_t').filter()"> </p:inputText>
+          	    </f:facet>     	    
+				<h:outputText escape="false" value="#{cand.jobStatusLabel()}"/>
+			</p:column> 
+			
+			<p:column headerText="Last Note" filterBy="#{cand.lastNote}" sortBy="#{cand.lastNote}">
+			    <f:facet name="filter">
+          			<p:inputText style="width:90%" onchange="PF('#{id}_t').filter()"> </p:inputText>
+          	    </f:facet>
+				<h:outputText value="#{cand.lastNote}"/>
+			</p:column>
+			
+	</p:dataTable>
+	
+</ui:composition>
+</html>

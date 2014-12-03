@@ -1,0 +1,190 @@
+.requirement-label{
+	padding:0px 2px !important;
+	margin-left:3px !important; 
+	margin-bottom:3px !important;
+}
+
+#jobSelectMenu_panel .ui-selectonemenu-items-wrapper{
+	height:350px !important;
+}
+.whitesmoke{
+	background-color:whitesmoke !important;
+}
+.ui-commandlink:hover{
+	text-decoration:none !important;
+}
+.grid_inputCol{
+	padding:10px 0px;
+	width:80%;
+}
+.myList{
+	padding:10px 0px;
+}
+.mySeperatorLine{
+	border-bottom:1px solid #d4d4d4;
+}
+.myList li{
+	list-style-type:none;
+	margin-bottom:10px
+}
+.grid_btnCol{
+	padding:0px 5px;
+	width:60px;
+}
+
+.ui-editor{
+height:100% !important;
+}
+.ui-widget-overlay{
+opacity:0.5}
+.hasDatepicker{
+width:100% !important}
+.footerPanel{
+margin-top:30px;
+padding-top:10px;
+border-top:1px solid #eee;
+}
+.footerBtn{
+float:right !important;
+margin-left:5px;
+}
+.grid_outputCol{
+	border-bottom:1px solid #d9edf7;
+	width:300px;
+	padding:10px;
+}
+.grid_checkBoxCol{
+	width:50px;
+	padding:10px;
+	border-bottom:1px solid #d9edf7;
+}
+.grid_labelCol{
+	border-bottom:1px solid #d9edf7;
+	color:grey;
+	width:100px;
+	padding:10px;
+}
+.table_label{
+width:150px !important;
+}
+.table_input{
+width:250px !important;
+}
+
+.fillWidth{
+width:100% !important;
+}
+
+.SMS-bubble:before{
+	position:absolute;
+	content:"\00a0";
+	width:0px;
+	height:0px;
+	border-width:8px 18px 8px 0;
+	border-style:solid;
+	border-color:transparent #E6E6E6 transparent transparent;
+	top:20px;
+	left:-18px;
+}
+
+.ui-autocomplete-panel{
+width:20% !important;
+}
+.my-status{
+width:90% !important;
+color:whitesmoke !important;
+display:block !important;
+opacity:0.8 !important;
+}
+.ui-panel-content{
+padding:0px !important;
+}
+.badge{
+background-color:whitesmoke
+}
+.container-panel{
+padding:0px !important;
+margin:0px !important;
+border:none !important;
+}
+.left{
+float:left;
+margin-right:5px;
+}
+.right{float:right}
+.my-header{
+background-color:#003366 !important;
+margin-bottom:0px !important;
+padding:10px !important;
+}
+.my-detail-panel{
+background-color:white;
+padding:10px !important;
+border:1px solid #d4d4d4;
+}
+.my-panel-header{
+background-color:#f5f5f5 !important;
+margin-bottom:0px !important;
+padding:10px !important;
+border:1px solid #d4d4d4;
+}
+.my-panel{
+background-color:#f5f5f5 !important;
+padding:10px !important;
+border:1px solid #d4d4d4;
+}
+.my-item-panel{
+background-color:#f5f5f5 !important;
+padding:5px !important;
+border:1px solid #d4d4d4;
+width:100%;
+margin-bottom:10px; !important;
+}
+.ui-state-default{
+background-image:inherit !important;
+}
+.ui-state-active{
+background-color:#428bca !important;
+}
+.ui-state-active .ui-icon{
+background-image:url("/TempsRoster/javax.faces.resource/images/ui-icons_ffffff_256x240.png.jsf?ln=primefaces-bootstrap"); !important;
+}
+.ui-tabs-selected{
+background-color:#e6e6e6 !important;
+}
+.ui-toolbar{
+background-image:inherit !important;
+background-color: #f5f5f5 !important
+}
+.ui-state-highlight{
+color:inherit !important;
+background-image:inherit !important;
+background-color:#d9edf7 !important;
+}
+.ui-autocomplete-input{
+background:transparent  !important ;
+border:none  !important ;
+box-shadow:none  !important ;
+}
+.input_
+{display:none;
+}
+.edit{
+display:none;
+}
+
+.clearfix:after {
+clear: both;
+content: '.';
+display: block;
+height: 0px;
+overflow: hidden;
+visibility: hidden;
+}
+.label{ margin-left:5px;
+       font-size:100% !important}
+.ui-selectonemenu .ui-selectonemenu-trigger{
+width:24px
+}
+.ui-autocomplete-input{
+width:100%}

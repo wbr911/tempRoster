@@ -1,0 +1,609 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+
+<ui:composition>
+
+	<p:panel id="candDetailDialog" widgetVar="candDetailDialog"
+		style="position:fixed ;right:-1000px; top:43px ; width:40% ;display:none; max-width: 100%;min-width:320px ;overflow-y:scroll;padding:10px 20px">
+		<p:panel styleClass="container-panel" id="candDetailDialogContent" widgetVar="candDetailDialogContent">
+			<h:form id="#{id}_DetailAction_f" prependId="false">
+				<p:panel styleClass="container-panel" style="position:relative">
+   
+					<div id="createTool" style="display: none">
+						<p:fileUpload value="#{fileUploadView.file}" label="CV Parser"
+						  onstart="$('#ajaxLoading').show()"
+							auto="true" fileUploadListener="#{candidateView.uploadCV}"
+							oncomplete="$('#ajaxLoading').hide();PF('CVParsing_dialog').show();$('#CVParsing_dialog').css('top','40px')"
+							update="@([id=CVParsing_content])" />
+					</div>
+					<label id="candDetail_closeBtn" class="btn"
+						onclick="closeCandDetail()"><span style="font-size: 20px"
+						class="glyphicon glyphicon-circle-arrow-right"></span></label>
+
+					<div id="candDetail_toolPanel" class="panel ui-toolbar clearfix"
+						style="display: none">
+						<div class="clearfix" style="width: 100%">
+							<p:selectOneMenu id="jobSelectMenu" styleClass="left"
+								value="#{candidateView.selectJob}" converter="jobConverter"
+								var="j" style="width:100%;margin:5px 5px"
+								panelStyle="min-width:1000px" effect="fade" filter="true"
+								filterMatchMode="contains">
+								<f:selectItem id="selectJobMenu_Header"  
+								itemValue="#{candidateView.jobHeader}" itemLabel="select" itemDisabled="true"/>
+								<f:selectItems  value="#{candidateView.availableJobList}" var="job"
+									itemLabel="#{job.id} | #{job.title} | #{job.client.name} | #{job.progressString}"
+									itemValue="#{job}" />
+									<f:selectItems itemDisabled="true"  value="#{candidateView.disabledJobList}" var="job"
+									itemLabel="#{job.id} | #{job.title} | #{job.client.name}"
+									itemValue="#{job}" />
+								<p:column >
+									<h:outputText value="#{j.id}" />
+								</p:column>
+								<p:column>
+									<h:outputText value="#{j.title}" />
+								</p:column>
+								<p:column>
+									<h:outputText value="#{j.client.name}" />
+								</p:column>
+								<p:column >
+									<h:outputText escape="false" value="#{j.progressLabel}" />
+								</p:column>
+								<p:column >
+									<h:outputText value="#{j.amountString}" />
+								</p:column>
+								<p:column >
+									<h:outputText value="#{j.noResponseString}"/>
+								</p:column>
+								<p:column>
+									<h:outputText value="#{j.refusedString}"/>
+								</p:column>
+								<p:column>
+									<h:outputText escape="false" value="#{j.statusLabel}"/>
+								</p:column>
+								
+							</p:selectOneMenu>
+
+						</div>
+						<div class="clearfix" style="margin: 5px 5px">
+							<p:commandLink styleClass="left" update="@([id=msgDialog_f])"
+								oncomplete="$('#hiddenMsgBtn').click()">
+								<label class="btn btn-primary">choose/send msg</label>
+							</p:commandLink>
+							<label class="btn" data-toggle="modal" data-target="#msgDialog"
+								id="hiddenMsgBtn"></label>
+
+							<p:commandLink styleClass="left"
+								actionListener="#{candidateView.addtoJob('accepted')}"
+								update="@([id=msg_in_main])"
+								 oncomplete="closeCandDetail();PF('candidates_t').filter()">
+								<label class="btn btn-success" style="width: 138px">add to job</label>
+							</p:commandLink>
+						</div>
+					</div>
+				</p:panel>
+			</h:form>
+			<p:panel id="candDetail" style="border:none; padding:0px 0px">
+				<p:outputLabel value="ID: #{candidateView.selectedCand.id}"
+					style="font-size:1.5em" styleClass="text-primary" />
+				<p:tabView
+					style="background:transparent;border:none;padding:0px 0px"
+					prependId="false">
+					<p:tab title="detail">
+						<h:form prependId="false" id="#{id}_detail_f"
+							enctype="multipart/form-data">
+							<p:commandLink id="detailView_submitBtn" style="display:none"
+								actionListener="#{candidateView.edit}"
+								update="@([id=candDetailDialog])"
+								process="@([id=candidates_detail_f])"
+								oncomplete="PF('candidates_t').filter();showCandDetail()">
+								<button type="button" class="btn btn-primary footerBtn">Yes</button>
+							</p:commandLink>
+							<div class="row" style="position: relative">
+								<div id="picContainer" class="col-md-4">
+									<label id="picEditBtn" style="padding: 0px 0px;"
+										class="btn left"
+										onclick="$('#picLoader').show();$('#candDetailPic').hide();$('#picEditBtn').hide()">
+										<span class="glyphicon glyphicon-edit"
+										style="font-size: 15px;"></span>
+									</label>
+									<p:fileUpload id="picLoader" label="choose"
+										uploadLabel="upload" style="display:none" auto="true"
+										update="candDetailPic"
+										fileUploadListener="#{candidateView.uploadPic}"
+										oncomplete="$('#picLoader').hide();$('#candDetailPic').show();$('#picEditBtn').show()" />
+									<p:graphicImage id="candDetailPic" styleClass="left"
+										value="#{candidateView.selectedCand.pic}" width="100%" />
+								</div>
+								<p:panel id="tagsContainer" styleClass="col-md-8"
+									style="border:none;padding:0px 0px">
+									<h:outputText id="matchedTagStr" value="#{candidateView.selectedCand.matchedTagStr}" style="display:none"></h:outputText>
+									<div class="row">
+										<label class="btn" onclick="showTagsEditView()"
+											style="padding: 0px 0px"><span
+											class="glyphicon glyphicon-edit"
+											style="margin-left: 5px; margin-bottom: 5px"></span></label>
+									</div>
+									<div class="row">
+										<ui:repeat var="tag" value="#{candidateView.selectedCand.skills}">
+											<p:outputLabel value="#{tag}" 
+											styleClass="label label-primary" style="float:left"><a class="glyphicon glyphicon-remove edit" style="color: white;" onclick="removeTag(this)"></a>
+											</p:outputLabel>
+										</ui:repeat>
+									</div>
+									<div class="row">
+										<ui:repeat var="tag"
+											value="#{candidateView.selectedCand.certificates}">
+											<p:outputLabel value="#{tag}" styleClass="label label-info"
+												style="float:left"><a class="glyphicon glyphicon-remove edit"
+												style="color: white;" onclick="removeTag(this)"></a>
+											</p:outputLabel>
+										</ui:repeat>
+									</div>
+									<div class="row">
+										<ui:repeat var="tag"
+											value="#{candidateView.selectedCand.keywords}">
+											<p:outputLabel value="#{tag}"
+												styleClass="label label-warning" style="float:left"><a class="glyphicon glyphicon-remove edit"
+													style="color: white;" onclick="removeTag(this)"></a>
+											</p:outputLabel>
+										</ui:repeat>
+									</div>
+								</p:panel>
+								<p:panel id="tagsEditView"
+									style="display:none;position:absolute;width:100%;top:0%;padding-bottom:30px;
+         -webkit-box-shadow:0px 5px 5px #5F9DD3;
+         box-shadow:0px 5px 5px #5F9DD3;
+         -moz-box-shadow:0px 5px 5px #5F9DD3"
+									styleClass="bg-info clearfix">
+									<div id="tagsEditViewDetail" style="display: none">
+										<div class="row">
+											<p:outputLabel value="skills"
+												style="margin-right:10px;margin-left:15px" />
+											<div class="col-md-12" id="skills_panel"
+												onclick="$('#skillsVar_input').focus()">
+												<p:panel styleClass="clearfix">
+													<p:autoComplete
+														style="width:20px;float:left;border:none; text-align"
+														id="skillsVar" widgetVar="skillsVar"
+														onkeydown="keyListener(event);changeLength(event)"
+														forceSelection="true"
+														completeMethod="#{keyWordDao.completeSkillsTag}"
+														onchange="addTag('skillsVar','skills')" placeholder=">>" /></p:panel>
+											</div>
+										</div>
+
+										<div class="row">
+
+											<p:outputLabel value="certificates"
+												style="margin-right:10px;margin-left:15px" />
+
+											<div class="col-md-12" id="certificates_panel"
+												onclick="$('#certificatesVar_input').focus()">
+												<p:panel styleClass="clearfix">
+													<p:autoComplete style="width:20px;float:left;border:none"
+														id="certificatesVar" widgetVar="certificatesVar"
+														onkeydown="keyListener(event); changeLength(event)"
+														forceSelection="true"
+														completeMethod="#{keyWordDao.completeCertificatesTag}"
+														onchange="addTag('certificatesVar','certificates')"
+														placeholder=">>" /></p:panel>
+											</div>
+										</div>
+										<div class="row">
+
+											<p:outputLabel value="user define"
+												style="margin-right:10px;margin-left:15px" />
+
+											<div class="col-md-12" id="userDefine_panel"
+												onclick="$('#userDefineVar_input').focus()">
+												<p:panel styleClass="clearfix">
+													<p:autoComplete style="width:20px;float:left;border:none"
+														id="userDefineVar" widgetVar="userDefineVar"
+														onkeydown="keyListener(event);changeLength(event)"
+														forceSelection="true"
+														completeMethod="#{keyWordDao.completeUserDefinesTag}"
+														onchange="addTag('userDefineVar','userDefine')"
+														placeholder=">>" />
+												</p:panel>
+
+											</div>
+										</div>
+
+									</div>
+									<div class="row"
+										style="position: absolute; bottom: 0px; right: 5px">
+										<label style="float: right" class="btn"
+											onclick="hideTagsEditView()"><span
+											class="glyphicon glyphicon-remove" /></label>
+										<p:commandLink actionListener="#{candidateView.editTags}"
+											process="@([id=tagsEditView])" update="@([id=tagsContainer])"
+											onstart="parseCandTag('hiddenCandTag','')" oncomplete=" show_matched_tags()"
+											style="float:right">
+											<label class="btn"><span
+												class="glyphicon glyphicon-ok"> </span></label>
+										</p:commandLink>
+
+										<p:inputText id="hiddenCandTag"
+											value="#{candidateView.candTags}" type="hidden"></p:inputText>
+									</div>
+								</p:panel>
+								<!-- end of the tagsEditContainer -->
+							</div>
+							<!-- end of the pic and tag row -->
+							<div class="row" style="margin-top: 10px; margin-bottom: 10px">
+								<p:panel styleClass="bg-info"
+									style="display:inline-block;width:100%">
+
+									<p:outputLabel id="statusDetail"
+										value="#{candidateView.selectedCand.status}"
+										style="float:left;margin-right:10px" />
+									<div id="chosenDetail" style="display: none; float: left;">
+										<kbd>chosen by</kbd>
+										<h:outputText value="#{candidateView.selectedCand.chosenBy}"
+											style="margin:0px 10px" />
+										<kbd>for job</kbd>
+										<h:outputText value="#{candidateView.selectedCand.job}"
+											style="margin-left:10px"></h:outputText>
+									</div>
+									<div id="placedDetail" style="display: none; float: left">
+										<kbd>placed to</kbd>
+										<h:outputText value="#{candidateView.selectedCand.employer}"
+											style="margin:0px 10px"></h:outputText>
+										<kbd>for job</kbd>
+										<h:outputText value="#{candidateView.selectedCand.job}"
+											style="margin-left:10px"></h:outputText>
+									</div>
+
+								</p:panel>
+							</div>
+
+							<!-- xxxxxxxxxxxxxxxxxxxxxxxxxxxx detail info xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+							<div class="row">
+
+								<p:panel id="candDetailInfo" styleClass="bg-info"
+									style="width:100%;font-size:15px">
+									<label class="btn output_" onclick="showCandInfoEditView()"><span
+										class="glyphicon glyphicon-edit"></span></label>
+									<h:panelGrid columns="4" style="width:100%">
+										<p:outputLabel value="name" />
+										<h:outputText styleClass="output_"
+											value="#{candidateView.selectedCand.name}" />
+										<p:inputText required="true"
+											requiredMessage="value is required" id="newCandName"
+											styleClass="input_"
+											value="#{candidateView.selectedCand.name}" style="width:100%" />
+										<p:message for="newCandName" />
+										<p:outputLabel value="title" />
+										<h:outputText styleClass="output_"
+											value="#{candidateView.selectedCand.title}" />
+
+										<p:selectOneMenu id="newCandTitle" styleClass="input_"
+											style="width:100%" filter="true"
+											value="#{candidateView.selectedCand.title}" required="true"
+											requiredMessage="value is required" panelStyle="width:500px">
+											<f:selectItem itemLabel="Select One" value="#{null}"
+												noSelectionOption="true"></f:selectItem>
+											<f:selectItems value="#{titleDao.titleList}" var="title"
+												itemLabel="${title}" itemValue="${title}" />
+										</p:selectOneMenu>
+										<p:message for="newCandTitle" />
+
+										<p:outputLabel value="age" />
+										<h:outputText styleClass="output_"
+											value="#{candidateView.selectedCand.age}" />
+										<p:inputText id="newCandAge" required="true"
+											requiredMessage="value is required" styleClass="input_"
+											value="#{candidateView.selectedCand.age}" style="width:100%">
+											<f:converter converterId="javax.faces.Integer"></f:converter>
+											<f:validateLongRange minimum="18"></f:validateLongRange>
+										</p:inputText>
+										<p:message for="newCandAge"></p:message>
+										
+										<p:outputLabel  value="gender"/>
+										<h:outputText styleClass="output_" value="#{candidateView.selectedCand.gender}"/>
+										<p:selectOneMenu id="newCandGender" styleClass="input_" style="width:100%" value="#{candidateView.selectedCand.gender}"
+										required ="true" requiredMessage="value is required" panelStyle="width:500px">
+										<f:selectItem itemLabel="male" itemValue="male"/>
+										<f:selectItem itemLabel="female" itemValue="female"/>
+										</p:selectOneMenu>
+										<p:message for="newCandGender"/>
+
+										<p:outputLabel value="phone" />
+										<h:outputText styleClass="output_"
+											value="#{candidateView.selectedCand.phone}" />
+										<p:inputText id="newCandPhone" required="true"
+											requiredMessage="value is required"
+											validatorMessage="phone number should start with 13,14,15,18 and consists of 11 digits"
+											styleClass="input_"
+											value="#{candidateView.selectedCand.phone}"
+											style="width:100%">
+											<f:validateRegex pattern="^1[3|4|5|8]\d{9}$"></f:validateRegex>
+										</p:inputText>
+										<p:message for="newCandPhone"></p:message>
+
+										<p:outputLabel value="email" />
+										<h:outputText styleClass="output_"
+											value="#{candidateView.selectedCand.email}" />
+										<p:inputText id="newCandEmail"
+											validatorMessage="wrong email format" required="true"
+											requiredMessage="value is required" styleClass="input_"
+											value="#{candidateView.selectedCand.email}"
+											style="width:100%">
+											<f:validateRegex
+												pattern="^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$"></f:validateRegex>
+										</p:inputText>
+										<p:message for="newCandEmail"></p:message>
+
+										<p:outputLabel value="address" />
+										<h:outputText styleClass="output_"
+											value="#{candidateView.selectedCand.address.des}" />
+										<p:inputText id="newCandAddress" styleClass="input_"
+											value="#{candidateView.selectedCand.address.des}"
+											style="width:100%" />
+										<p:message for="newCandAddress"></p:message>
+
+										<p:outputLabel value="education" />
+
+										<h:outputText styleClass="output_"
+											value="#{candidateView.selectedCand.education}" />
+										<p:selectOneMenu id="newCandEducation" styleClass="input_"
+											value="#{candidateView.selectedCand.education}"
+											required="true" requiredMessage="value is required"
+											style="width:100%">
+											<f:selectItem itemLabel="Higher than" value="#{null}"
+												noSelectionOption="true"></f:selectItem>
+											<f:selectItems value="#{candidateView.educationList}"
+												var="edu" itemLabel="#{edu}" itemValue="#{edu}"></f:selectItems>
+										</p:selectOneMenu>
+										<p:message for="newCandEducation"></p:message>
+
+									</h:panelGrid>
+								</p:panel>
+
+								<div id="candCreateConfirm_tool" class="footerPanel"
+									style="display: none;">
+									<p:commandLink id="candDetailDeleteBtn" process="@this"
+										update="candDetailInfo,@([id=#{id}_DetailAction_f])"
+										actionListener="#{candidateView.deleteNewCand}"
+										oncomplete="closeCandDetail();PF('mainViewBlock').hide();$('#candCreateConfirm_tool').hide()"
+										styleClass="footerBtn">
+										<label class="btn btn-default">Cancel</label>
+										<p:confirm header="Cancel Confirm"
+											message="Sure to cancel the new candidate"
+											icon="ui-icon-alert"></p:confirm>
+									</p:commandLink>
+									<p:commandLink id="candDetailAddBtn"
+										update="@form,@([id=#{id}_DetailAction_f])"
+										actionListener="#{candidateView.edit}" validateClient="true"
+										oncomplete="if(args &amp;&amp; !args.validationFailed){
+        	PF('mainViewBlock').hide();PF('candidates_t').filter();_initCandDetail();$('#candCreateConfirm_tool').hide()}else{showCreateCandView()}"
+										styleClass="footerBtn">
+										<label class="btn btn-primary">Add</label>
+									</p:commandLink>
+								</div>
+
+								<div id="candInfoEdit_tool" class="input_ footerPanel">
+									<p:commandLink id="candDetailCancelBtn" 
+										process="@none" oncomplete="hideCandInfoEditView()"
+										styleClass="footerBtn">
+										<label class="btn btn-default">Cancel</label>
+									</p:commandLink>
+
+									<p:commandLink id="candDetailInfoEditBtn" 
+										 update="candDetailInfo" actionListener="#{candidateView.edit}" oncomplete="if(args &amp;&amp; !args.validationFailed){hideCandInfoEditView();PF('candidates_t').filter()}else{showCandInfoEditView()}"
+										styleClass="footerBtn">
+										<label class="btn btn-primary">Save</label>
+									</p:commandLink>
+								</div>
+
+							</div>
+						</h:form>
+					</p:tab>
+					<p:tab title="resume">
+						<h:form>
+							<p:panel id="resumeContainer" styleClass="container-panel">
+								<div id="resumeOutput">
+									<label class="btn"
+										onclick="$('#resumeOutput').hide();$('#resumeEditPanel').show()"><span
+										class="glyphicon glyphicon-edit"></span></label>
+										<br/>
+									<h:outputText id="resume" escape="false"
+										value="#{candidateView.selectedCand.resume}" disabled="true"
+										style="width:100%;height:100%;overflow-y:scroll"></h:outputText>
+								</div>
+								<div id="resumeEditPanel" style="display: none">
+									<p:inputTextarea id="resumeEditor" autoResize="true"
+										value="#{candidateView.selectedCand.resume}"
+										style="width:100%;height:600px;overflow-y:scroll" />
+									<p:commandLink process="resumeContainer"
+										update="resumeContainer"
+										actionListener="#{candidateView.edit}">
+										<label class="btn btn-primary">Save</label>
+									</p:commandLink>
+									<label class="btn btn-default"
+										onclick="$('#resumeEditPanel').hide();$('#resumeOutput').show()">Cancel</label>
+								</div>
+							</p:panel>
+						</h:form>
+					</p:tab>
+					<p:tab title="note">
+						<h:form prependId="false" id="note_f">
+							<label id="addNote_btn" class="btn btn-primary"
+								onclick="$('#newNote').show();$('#addNote_btn').hide()"><span
+								class="glyphicon glyphicon-plus"></span></label>
+							<div class="row">
+								<p:panel id="newNote" styleClass="bg-info clearfix"
+									style="margin:10px 0px;display:none">
+									<p:inputTextarea maxlength="100" id="newNoteContent"
+										value="#{candidateView.newNote.content}" style="width:100%"></p:inputTextarea>
+									<label class='btn' style="float: right"><span
+										class="glyphicon glyphicon-remove"
+										onclick="$('#newNote').hide();$('#newNoteContent').val('');$('#addNote_btn').show()"></span></label>
+									<p:commandLink style="float:right" update="note_f"
+										actionListener="#{candidateView.addNote}" process="newNote"
+										oncomplete="$('#newNote').hide();$('#newNoteContent').val('');$('#addNote_btn').show();PF('candidates_t').filter()">
+										<label class='btn'><span
+											class="glyphicon glyphicon-ok"></span></label>
+									</p:commandLink>
+
+								</p:panel>
+							</div>
+							<ui:repeat var="note"
+								value="#{candidateView.selectedCand.noteList}">
+								<div class="row">
+									<p:panel styleClass="bg-info" style="margin:10px 0px">
+										<div class="clearfix">
+											<p:outputLabel value="#{note.id}" style="display:none"
+												styleClass="noteId" />
+											<div style="float: left">
+												<h4>
+													<kbd>noted by</kbd>
+													&nbsp; &nbsp;
+													<h:outputText value="#{note.consultant}" />
+												</h4>
+											</div>
+											<div style="float: right">
+												<h:outputText value="#{note.date}"></h:outputText>
+												<p:commandLink update="@([id=note_f])"
+													actionListener="#{candidateView.deleteNote()}"
+													process="@this">
+													<f:setPropertyActionListener
+														target="#{candidateView.selectedNote}" value="#{note}"></f:setPropertyActionListener>
+													<f:param name="deleteId" value="#{note.id}"></f:param>
+													<span class="glyphicon glyphicon-remove"></span>
+												</p:commandLink>
+											</div>
+										</div>
+										<h:outputText escape="false" value="#{note.content}"></h:outputText>
+									</p:panel>
+								</div>
+							</ui:repeat>
+
+						</h:form>
+					</p:tab>
+				</p:tabView>
+
+			</p:panel>
+		</p:panel>
+	</p:panel>
+	<p:dialog id="CVParsing_dialog" header="CV Parser"
+		widgetVar="CVParsing_dialog" modal="true" height="80%"
+		style="overflow-y:scroll">
+		<h:form prependId="false">
+			<p:panel id="CVParsing_content" styleClass="container-panel">
+			<div class="clearfix">
+			    <div class="left">
+				<h:panelGrid columns="3"
+					columnClasses="grid_checkBoxCol,grid_labelCol,grid_outputCol">
+
+					<p:selectBooleanCheckbox value="#{candidateView.use_parsed_pic}" />
+					<p:outputLabel value="pic" />
+					<p:graphicImage value="#{candidateView.parsedCand.pic}"
+						height="200"></p:graphicImage>
+
+					<p:selectBooleanCheckbox value="#{candidateView.use_parsed_name}" />
+					<p:outputLabel value="name" />
+					<p:outputLabel value="#{candidateView.parsedCand.name}" />
+
+
+					<p:selectBooleanCheckbox value="#{candidateView.use_parsed_title}" />
+					<p:outputLabel value="title" />
+					<p:outputLabel value="#{candidateView.parsedCand.title}" />
+
+					<p:selectBooleanCheckbox value="#{candidateView.use_parsed_age}" />
+					<p:outputLabel value="age" />
+					<p:outputLabel value="#{candidateView.parsedCand.age}" />
+
+					<p:selectBooleanCheckbox value="#{candidateView.use_parsed_gender}" />
+					<p:outputLabel value="gender" />
+					<p:outputLabel value="#{candidateView.parsedCand.gender}" />
+
+					<p:selectBooleanCheckbox value="#{candidateView.use_parsed_phone}" />
+					<p:outputLabel value="phone" />
+					<p:outputLabel value="#{candidateView.parsedCand.phone}" />
+
+
+					<p:selectBooleanCheckbox value="#{candidateView.use_parsed_email}" />
+					<p:outputLabel value="email" />
+					<p:outputLabel value="#{candidateView.parsedCand.email}" />
+
+					<p:selectBooleanCheckbox
+						value="#{candidateView.use_parsed_education}" />
+					<p:outputLabel value="education" />
+					<p:outputLabel value="#{candidateView.parsedCand.education}" />
+
+					
+
+				</h:panelGrid>
+                </div>
+                <div class="left clearfix"  style="width:450px">
+                <p:selectBooleanCheckbox value="#{candidateView.use_parsed_tags}" />
+				<p:outputLabel value="tags" />
+				<br/>	
+					<p:panel id="parsed_tagsContainer"
+						style="border:none;padding:0px 0px;width:100%">
+						<div class="row">
+							<div id="skillsVar_parsed">
+								<ui:repeat var="tag" value="#{candidateView.parsedCand.skills}">
+									<p:outputLabel value="#{tag}" styleClass="label label-primary"
+										style="float:left"><a class="glyphicon glyphicon-remove " style="color: white;"
+											onclick="removeTag(this)"></a>
+									</p:outputLabel>
+								</ui:repeat>
+							</div>
+						</div>
+						<div class="row">
+							<div id="certificatesVar_parsed">
+								<ui:repeat var="tag"
+									value="#{candidateView.parsedCand.certificates}">
+									<p:outputLabel value="#{tag}" styleClass="label label-info"
+										style="float:left"><a class="glyphicon glyphicon-remove " style="color: white;"
+											onclick="removeTag(this)"></a>
+									</p:outputLabel>
+								</ui:repeat>
+							</div>
+						</div>
+						<div class="row">
+							<div id="userDefineVar_parsed">
+								<ui:repeat var="tag"
+									value="#{candidateView.parsedCand.keywords}">
+									<p:outputLabel value="#{tag}" styleClass="label label-warning"
+										style="float:left"><a class="glyphicon glyphicon-remove " style="color: white;"
+											onclick="removeTag(this)"></a>
+									</p:outputLabel>
+								</ui:repeat>
+							</div>
+						</div>
+					</p:panel>
+          
+               </div>
+				<p:inputText id="hiddenParsedCandTag"
+					value="#{candidateView.parsedCandTags}" type="hidden"></p:inputText>
+				</div>
+				<div class="footerPanel" style="display: block">
+					<p:commandLink
+						onstart="parseCandTag('hiddenParsedCandTag','_parsed')"
+						actionListener="#{candidateView.useParsedCand}"
+						oncomplete="PF('CVParsing_dialog').hide();showCreateCandView();$('#candDetailAddBtn').click()"
+						update="@([id=candDetailDialogContent])">
+						<label class="btn btn-primary">Confirm</label>
+					</p:commandLink>
+					<p:commandLink process="@this" update="@this"
+						oncomplete="PF('CVParsing_dialog').hide()">
+						<p:confirm header="Confirm"
+							message="sure to drop the parsed result"></p:confirm>
+						<label class="btn btn-danger">Cancel</label>
+					</p:commandLink>
+				</div>
+			</p:panel>
+		</h:form>
+
+	</p:dialog>
+
+</ui:composition>
+</html>

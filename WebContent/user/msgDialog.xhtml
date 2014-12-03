@@ -1,0 +1,61 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+<ui:composition>
+	<!-- Button trigger modal -->
+
+
+	<!-- Modal -->
+	<div class="modal fade" id="msgDialog" tabindex="-1" role="dialog"
+		aria-labelledby="myModalLabel" aria-hidden="true">
+		<div class="modal-dialog modal-lg">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal">
+						<span aria-hidden="true">&times;</span><span class="sr-only">Close</span>
+					</button>
+					<h4 class="modal-title" id="myModalLabel">
+						Auto feedback collecting
+						<p:outputLabel value="#{job.title}" />
+					</h4>
+				</div>
+				<div class="modal-body" style="overflow: scroll; max-height: 650px">
+					<p:tabView>
+						<p:tab title="Email">
+							<ui:decorate template="emailTemplate.xhtml" />
+						</p:tab>
+						<p:tab title="SMS">
+							<ui:decorate template="SMSTemplate.xhtml" />
+						</p:tab>
+					</p:tabView>
+				</div>
+				<div class="modal-footer">
+
+					<p:selectManyCheckbox id="message"
+						value="#{candidateView.selectMessageTypes}"
+						style="font-weight: normal !important;
+        		float: right;
+        		margin-left: 800px;
+        		margin-right: 22px;">
+						<f:selectItem itemLabel="SMS" itemValue="sms" />
+						<f:selectItem itemLabel="Email" itemValue="email" />
+					</p:selectManyCheckbox>
+					<button type="button" class="btn btn-default" data-dismiss="modal"
+						style="margin-right: 5px">Close</button>
+					<p:commandLink
+						actionListener="#{candidateView.addtoJob('no response')}"
+						update="@([id=candDetailDialog]),@([id=msg_in_main])"
+						oncomplete="$('#ClearTableBtn').click()">
+						<button type="button" class="btn btn-primary" data-dismiss="modal">Send</button>
+					</p:commandLink>
+				</div>
+			</div>
+		</div>
+	</div>
+</ui:composition>
+</html>

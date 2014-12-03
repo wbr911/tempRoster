@@ -1,0 +1,175 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+<ui:composition>
+
+	<h:form id="candidates_f" prependId="false">
+
+
+		<p:dataTable id="candidates_t" widgetVar="candidates_t" var="cand"
+			value="#{candidateView.candidates}" rowKey="#{cand.id}"
+			selection="#{candidateView.selectedCandList}">
+			<p:ajax event="rowSelect" listener="#{candidateView.onRowSelect}"
+				update="@([id=candDetailDialogContent])"
+				oncomplete="showCandDetail()" />
+		
+			<p:column selectionMode="multiple" style="width:36px;" />
+
+			<p:column headerText="id" style="width:6%" filterBy="#{cand.id}"
+				sortBy="#{cand.id}" sortFunction="#{candidateView.sortId}"
+				filterMatchMode="contains">
+				<f:facet name="filter">
+					<p:inputText value="#{candidateView.idFilter}" style="width:90%"
+						onchange="PF('candidates_t').filter()">
+						<p:ajax event="change" process="@this" update="@this"/>
+					</p:inputText>
+				</f:facet>
+				<h:outputText value="#{cand.id}" />
+			</p:column>
+			<p:column headerText="name" filterBy="#{cand.name}"
+				sortBy="#{cand.name}" filterMatchMode="contains">
+				<f:facet name="filter">
+					<p:inputText value="#{candidateView.nameFilter}" style="width:90%"
+						onchange="PF('candidates_t').filter()">
+						<p:ajax event="change" process="@this" update="@this"/>
+					</p:inputText>
+				</f:facet>
+				<h:outputText value="#{cand.name}" style="word-break:break-all;" />
+			</p:column>
+			<p:column headerText="job title" style="width:15%"
+				filterBy="#{cand.title}" sortBy="#{cand.title}"
+				filterMatchMode="exact">
+				<f:facet name="filter">
+					<p:selectOneMenu value="#{candidateView.jobTitleFilter}"
+						widgetVar="candTitleFilter" style="width:100%"
+						onchange="PF('candidates_t').filter()" filter="true">
+						<p:ajax event="change" process="@this" update="@this"/>
+						<f:selectItem itemLabel="Select One" value="#{null}"
+							noSelectionOption="true"></f:selectItem>
+						<f:selectItems value="#{titleDao.titleList}" var="title"
+							itemLabel="${title}" itemValue="${title}" />
+					</p:selectOneMenu>
+				</f:facet>
+				<h:outputText value="#{cand.title}" style="word-break:break-all;" />
+			</p:column>
+			<p:column headerText="age" style="width:5%" filterBy="#{cand.age}"
+				sortBy="#{cand.age}" filterMatchMode="lte">
+				<f:facet name="filter">
+					<p:inputText value="#{candidateView.ageFilter}" placeholder="&lt;="
+						style="width:100%" onchange="PF('candidates_t').filter()">
+						<p:ajax event="change" process="@this" update="@this"/>
+						<f:converter converterId="javax.faces.Integer" />
+					</p:inputText>
+				</f:facet>
+				<h:outputText value="#{cand.age}" />
+			</p:column>
+			<p:column headerText="gender" width="6%"
+				filterBy="#{cand.gender}" sortBy="#{cand.gender}"
+				filterMatchMode="exact">
+				<f:facet name="filter">
+					<p:selectOneMenu value="#{candidateView.genderFilter}"
+						widgetVar="candGenderFilter" style="width:100%"
+						onchange="PF('candidates_t').filter()">
+						<p:ajax event="change" process="@this" update="@this"/>
+						<f:selectItem itemLabel="Select One" value="#{null}"
+							noSelectionOption="true"></f:selectItem>
+						<f:selectItem itemLabel="male" itemValue="male" />
+						<f:selectItem itemLabel="female" itemValue="female" />
+					</p:selectOneMenu>
+				</f:facet>
+				<h:outputText value="#{cand.gender}" />
+			</p:column>
+			<p:column headerText="education" filterBy="#{cand.education}"
+				sortBy="#{cand.education}"
+				filterFunction="#{candidateView.filterEducation}"
+				sortFunction="#{candidateView.sortEducation}">
+				<f:facet name="filter">
+					<p:selectOneMenu value="#{candidateView.educationFilter}"
+						widgetVar="candEducationFilter" style="width:100%"
+						onchange="PF('candidates_t').filter()">
+						<p:ajax event="change" process="@this" update="@this"/>
+						<f:selectItem itemLabel="Higher than" value="#{null}"
+							noSelectionOption="true"></f:selectItem>
+						<f:selectItems value="#{candidateView.educationList}" var="edu"
+							itemLabel="#{edu}" itemValue="#{edu}"></f:selectItems>
+					</p:selectOneMenu>
+				</f:facet>
+				<h:outputText value="#{cand.education}"
+					style="word-break:break-all;" />
+			</p:column>
+
+			<p:column headerText="address" filterBy="#{cand.address.des}" style="width:17%"
+				sortBy="#{cand.address.des}" filterMatchMode="contains">
+				<f:facet name="filter">
+					<p:inputText value="#{candidateView.addressFilter}"
+						style="width:90%" onchange="PF('candidates_t').filter()">
+						<p:ajax event="change" process="@this" update="@this"/>
+					</p:inputText>
+				</f:facet>
+				<h:outputText value="#{cand.address.des}"
+					style="word-break:break-all;" />
+			</p:column>
+
+			<p:column headerText="phone" filterBy="#{cand.phone}"
+				sortBy="#{cand.phone}" filterMatchMode="contains">
+				<f:facet name="filter">
+					<p:inputText value="#{candidateView.phoneFilter}" style="width:90%"
+						onchange="PF('candidates_t').filter()">
+						<p:ajax event="change" process="@this" update="@this"/>
+					</p:inputText>
+				</f:facet>
+				<h:outputText value="#{cand.phone}" style="word-break:break-all;" />
+			</p:column>
+			<p:column headerText="email" filterBy="#{cand.email}" style="width:10%"
+				sortBy="#{cand.email}" filterMatchMode="contains">
+				<f:facet name="filter">
+					<p:inputText value="#{candidateView.emailFilter}" style="width:90%"
+						onchange="PF('candidates_t').filter()">
+						<p:ajax event="change" process="@this" update="@this"/>
+					</p:inputText>
+				</f:facet>
+				<h:outputText value="#{cand.email}" style="word-break:break-all;" />
+			</p:column>
+			<p:column headerText="status" filterBy="#{cand.status}"
+				sortBy="#{cand.status}" filterMatchMode="exact"
+				width="8%">
+				<f:facet name="filter">
+					<p:selectOneMenu value="#{candidateView.statusFilter}"
+						widgetVar="candStatusFilter"
+						onchange="PF('candidates_t').filter()" style="width:90%">
+						<p:ajax event="change" process="@this" update="@this"/>
+						<f:selectItem itemLabel="Select One" itemValue="#{null}"
+							noSelectionOption="true" />
+						<f:selectItem itemLabel="available" itemValue="available" />
+						<f:selectItem itemLabel="chosen" itemValue="chosen" />
+						<f:selectItem itemLabel="rest" itemValue="rest" />
+						<f:selectItem itemLabel="placed" itemValue="placed" />
+					</p:selectOneMenu>
+				</f:facet>
+
+				<h:outputText escape="false" value="#{cand.statusLabel()}" />
+			</p:column>
+			<p:column headerText="Last Note" style="width:8%"
+				sortBy="#{cand.lastNote}" sortFunction="#{candidateView.sortDate}">
+				<h:outputText value="#{cand.lastNote}" />
+			</p:column>
+
+		</p:dataTable>
+		<p:commandButton style="display:none" process="@this" update="@this" />
+		<p:commandButton id="candidates_t_deleteBtn"
+			process="@([id=candidates_f])"
+			actionListener="#{candidateView.deleteBatch}"
+			oncomplete="PF('candidates_t').filter();closeCandDetail() "
+			update="@([id=candidates_t])" style="display:none">
+			<p:confirm header="Delete Confirm"
+				message="Sure to delete the candidate" icon="ui-icon-alert"></p:confirm>
+		</p:commandButton>
+	</h:form>
+
+</ui:composition>
+</html>

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+<ui:composition>
+	<p:overlayPanel id="favouritePanel" for="favourite" hideEffect="fade">
+		<p:panel id="favouriteContainer" styleClass="container-panel">
+			<h:panelGrid columns="2" columnClasses="grid_inputCol,grid_btnCol"
+				styleClass="mySeperatorLine">
+				<p:inputText widgetVar="newFavouriteName" id="newFavouriteName"
+					value="#{candidateView.newFavourite.name}" styleClass="fillWidth"></p:inputText>
+				<p:commandLink actionListener="#{candidateView.addFavourite}"
+					process="@([id=favouriteContainer])"
+					update="@form" >
+					<label class="btn btn-default">save</label>
+				</p:commandLink>
+			</h:panelGrid>
+			<ul class="myList">
+				<ui:repeat value="#{favouriteList}" var="record"  varStatus="loop">
+					<li>
+					<p:commandLink style="width:80%;display:inline-block"  process="@this" update="@this" oncomplete="clickNext($(this))">
+						<f:setPropertyActionListener target="#{candidateView.selectedFavourite}" value="#{record}"></f:setPropertyActionListener>
+					<label class="btn btn-default fillWidth"  >	 <h:outputText value="#{record.name}" /></label>
+					</p:commandLink>
+					<p:commandLink style="display:none"  actionListener="#{candidateView.chooseFavourite}"  process="@this" update="@form,@([id=candidates_t]),@([id=searchLabel])" 
+					oncomplete="updateTable('candidates_t');$('#searchLabel').slideDown();fillSearchTag()">	   
+                    </p:commandLink>
+                     
+				     <p:commandLink style="width:20px" process="@this" update="@this" oncomplete="clickNext($(this))">
+				      <f:setPropertyActionListener target="#{candidateView.selectedFavourite}" value="#{record}"/>
+				      <label class="btn"><span class="glyphicon glyphicon-trash"></span></label>
+				     </p:commandLink>
+				     <p:commandLink style="display:none"  actionListener="#{candidateView.deleteFavourite}"  process="@this" update="@([id=favouriteContainer])" >	   
+                    </p:commandLink>
+                     </li>
+				</ui:repeat>
+			</ul>
+
+		</p:panel>
+
+	</p:overlayPanel>
+</ui:composition>
+</html>
